@@ -1,0 +1,44 @@
+body {
+  display: flex;
+}
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background-color: black;
+  color: #fff;
+  border: 1px solid #ccc;
+}
+.matrix__row {
+  display: flex;
+}
+.closed-cell {
+
+
+}
+
+.matrix__container {
+  background-color: aqua;
+  width: 500px;
+  height: 500px;
+}
+
+
+.left-panel__container {
+  order: -1;
+  background-color: red;
+  /* width: 100px; */
+  height: 500px;
+}
+.left-panel__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background-color: green;
+  color: #fff;
+  border: 1px solid #ccc;
+}
