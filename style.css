@@ -12,8 +12,12 @@ body {
   color: #fff;
   border: 1px solid #ccc;
 }
-
-
+.cell-active {
+  background-color: #fff;
+}
+.cell-cross {
+  background-color: red;
+}
 
 
 .game__container {
@@ -45,7 +49,7 @@ body {
   display: flex;
 }
 .top-panel__column {
-  
+
 }
 .panel__cell {
   display: flex;

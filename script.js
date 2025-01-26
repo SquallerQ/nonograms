@@ -15,6 +15,7 @@ const matrix = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ];
+let emptyMatrix = [];
 
 const body = document.querySelector('body');
 const gameContainer = document.createElement("div");
@@ -27,20 +28,62 @@ matrixContainer.classList.add('matrix__container')
 gameContainer.append(matrixContainer);
 
 function displayMatrix () {
-  for (let i = 0; i < matrix.length; i++) {
+  emptyMatrix = createEmptyMatrix(matrix);
+  for (let i = 0; i < emptyMatrix.length; i++) {
     const row = document.createElement("div");
-    row.classList.add('matrix__row')
+    row.classList.add("matrix__row");
+    row.dataset.row = i;
     matrixContainer.append(row);
-    for (let j = 0; j < matrix[i].length; j++) {
-      let matrixCell = matrix[i][j];
-      const cell = document.createElement('div');
-      cell.classList.add('cell');
-      cell.innerHTML = matrixCell;
+    for (let j = 0; j < emptyMatrix[i].length; j++) {
+      // let matrixCell = emptyMatrix[i][j];
+      const cell = document.createElement("div");
+      cell.dataset.cell = j;
+      cell.classList.add("cell");
+      // cell.innerHTML = matrixCell;
       row.append(cell);
     }
-  };
+  }
+
+  matrixContainer.addEventListener("click", changeEmptyMatrix);
+  matrixContainer.addEventListener("contextmenu", changeEmptyMatrix);
 }
 displayMatrix();
+
+function changeEmptyMatrix(event) {
+  event.preventDefault() 
+ 
+  const clickedCell = event.target;
+  if (clickedCell.classList.contains("cell")) {
+    console.log(clickedCell);
+    const row = clickedCell.closest(".matrix__row");
+    const rowNumber = row.dataset.row;
+    const cellNumber = clickedCell.dataset.cell;
+
+    if (event.type === "click") {
+      clickedCell.classList.remove("cell-cross");
+
+      if (!clickedCell.classList.contains("cell-active")) {
+        clickedCell.classList.add("cell-active");
+        emptyMatrix[rowNumber][cellNumber] = 1;
+      } else if (clickedCell.classList.contains("cell-active")) {
+        clickedCell.classList.remove("cell-active");
+        emptyMatrix[rowNumber][cellNumber] = 0;
+      }
+    } else if (event.button === 2) {
+      clickedCell.classList.remove("cell-active");
+
+      if (!clickedCell.classList.contains("cell-cross")) {
+        clickedCell.classList.add("cell-cross");
+      } else if (clickedCell.classList.contains("cell-cross")) {
+        clickedCell.classList.remove("cell-cross");
+      }
+      emptyMatrix[rowNumber][cellNumber] = 0;
+    }
+  } else {
+    return;
+  }
+}
+
 
 function displayLeftPanel () {
   const leftPanelContainer = document.createElement('div')
@@ -138,5 +181,17 @@ function rotateMatrix(matrix) {
     rotatedMatrix.push(newRow);
   }
   return rotatedMatrix;
+}
+function createEmptyMatrix (matrix) {
+  const emptyMatrix = [];
+  
+  for (let i = 0; i < matrix.length; i++) {
+    const matrixRow = [];
+    for (let j = 0; j < matrix[i].length; j++) {
+      matrixRow.push(0);
+    }
+    emptyMatrix.push(matrixRow);
+  }
+  return emptyMatrix;
 }
 console.log('Start');
