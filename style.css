@@ -26,6 +26,7 @@ body {
 }
 .matrix__container {
   grid-area: matrix;
+  width: fit-content;
 }
 .matrix__row {
   display: flex;
@@ -60,4 +61,70 @@ body {
   background-color: green;
   color: #fff;
   border: 1px solid #ccc;
+}
+
+
+
+
+
+
+.popup__container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup__content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  position: relative;
+}
+
+.popup__close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #ccc;
+}
+
+.popup__close-button:hover {
+  color: #000;
+}
+
+.popup__message {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.popup__time {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.popup__ok-button {
+  background-color: green;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.popup__ok-button:hover {
+  background-color: yellow;
 }

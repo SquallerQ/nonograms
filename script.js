@@ -1,5 +1,5 @@
-const matrix = [
-  [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+const matrixTemplate = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -7,7 +7,7 @@ const matrix = [
   [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -28,18 +28,16 @@ matrixContainer.classList.add('matrix__container')
 gameContainer.append(matrixContainer);
 
 function displayMatrix () {
-  emptyMatrix = createEmptyMatrix(matrix);
+  emptyMatrix = createEmptyMatrix(matrixTemplate);
   for (let i = 0; i < emptyMatrix.length; i++) {
     const row = document.createElement("div");
     row.classList.add("matrix__row");
     row.dataset.row = i;
     matrixContainer.append(row);
     for (let j = 0; j < emptyMatrix[i].length; j++) {
-      // let matrixCell = emptyMatrix[i][j];
       const cell = document.createElement("div");
       cell.dataset.cell = j;
       cell.classList.add("cell");
-      // cell.innerHTML = matrixCell;
       row.append(cell);
     }
   }
@@ -54,7 +52,6 @@ function changeEmptyMatrix(event) {
  
   const clickedCell = event.target;
   if (clickedCell.classList.contains("cell")) {
-    console.log(clickedCell);
     const row = clickedCell.closest(".matrix__row");
     const rowNumber = row.dataset.row;
     const cellNumber = clickedCell.dataset.cell;
@@ -82,6 +79,7 @@ function changeEmptyMatrix(event) {
   } else {
     return;
   }
+  compareMatrix(emptyMatrix);
 }
 
 
@@ -90,13 +88,13 @@ function displayLeftPanel () {
   leftPanelContainer.classList.add("left-panel__container");
   gameContainer.append(leftPanelContainer);
   
-  for (let i = 0; i < matrix.length; i++) {
+  for (let i = 0; i < matrixTemplate.length; i++) {
     const leftPanelRow = document.createElement("div");
     leftPanelRow.classList.add("left-panel__row");
     leftPanelContainer.append(leftPanelRow);
     leftPanelRow.dataset.rowId = i;
 
-    const matrixRow = matrix[i];
+    const matrixRow = matrixTemplate[i];
     let numberOfBlackCells = 0;
     for (let j = 0; j < matrixRow.length; j++) {
 
@@ -127,7 +125,7 @@ function displayLeftPanel () {
 displayLeftPanel()
 
 function displayTopPanel() {
-  const rotatedMatrix = rotateMatrix(matrix);
+  const rotatedMatrix = rotateMatrix(matrixTemplate);
 
   const topPanelContainer = document.createElement("div");
   topPanelContainer.classList.add("top-panel__container");
@@ -194,4 +192,50 @@ function createEmptyMatrix (matrix) {
   }
   return emptyMatrix;
 }
+function compareMatrix (matrix) {
+  const matrixTemplateString = matrixTemplate.join(',');
+  const matrixPlayerClickedString = matrix.join(',');
+  if (matrixTemplateString === matrixPlayerClickedString) {
+    createVictoryPopup();
+  }
+}
+
+function createVictoryPopup() {
+
+  const popupContainer = document.createElement("div");
+  popupContainer.classList.add("popup__container");
+
+  const popupContent = document.createElement("div");
+  popupContent.classList.add("popup__content");
+
+  const closeButton = document.createElement("div");
+  closeButton.classList.add("popup__close-button");
+  closeButton.innerHTML = "&times;";
+
+  const victoryMessage = document.createElement("p");
+  victoryMessage.classList.add("popup__message");
+  victoryMessage.textContent = "You won";
+
+  const timeTaken = document.createElement("p");
+  timeTaken.classList.add("popup__time");
+  timeTaken.textContent = "Time: 00:00";
+
+  const okButton = document.createElement("div");
+  okButton.classList.add("popup__ok-button");
+  okButton.textContent = "OK";
+
+  popupContent.append(closeButton, victoryMessage, timeTaken, okButton);
+  popupContainer.append(popupContent);
+  document.body.append(popupContainer);
+
+  function closePopup() {
+    popupContainer.remove();
+  }
+
+  closeButton.addEventListener("click", closePopup);
+  okButton.addEventListener("click", closePopup);
+}
+
+
+
 console.log('Start');
