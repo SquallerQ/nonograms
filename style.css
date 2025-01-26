@@ -20,6 +20,11 @@ body {
 }
 
 
+
+.central__container {
+  display: flex;
+}
+
 .game__container {
   display: grid;
   grid-template-areas: "empty top-panel""left-panel matrix";
@@ -62,6 +67,31 @@ body {
   color: #fff;
   border: 1px solid #ccc;
 }
+
+
+
+
+
+
+
+.template__container {
+  width: 500px;
+  height: 500px;
+  background-color: aqua;
+}
+.template__container-headline {
+  color: #fff;
+  background-color: #000;
+
+}
+
+
+
+
+
+
+
+
 
 
 

@@ -17,15 +17,31 @@ const matrixTemplate = [
 ];
 let emptyMatrix = [];
 
+const gameOptions = {
+  difficult: 'easy',
+
+}
 const body = document.querySelector('body');
+
+const centralContainer = document.createElement("div");
+centralContainer.classList.add("central__container");
+body.append(centralContainer);
+
+createTemplatesPanel(gameOptions);
 const gameContainer = document.createElement("div");
 gameContainer.classList.add("game__container");
-body.append(gameContainer);
+centralContainer.append(gameContainer);
 
 
 const matrixContainer = document.createElement('div');
 matrixContainer.classList.add('matrix__container')
 gameContainer.append(matrixContainer);
+
+
+
+matrixContainer.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+})
 
 function displayMatrix () {
   emptyMatrix = createEmptyMatrix(matrixTemplate);
@@ -197,6 +213,8 @@ function compareMatrix (matrix) {
   const matrixPlayerClickedString = matrix.join(',');
   if (matrixTemplateString === matrixPlayerClickedString) {
     createVictoryPopup();
+    matrixContainer.removeEventListener("click", changeEmptyMatrix);
+    matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
   }
 }
 
@@ -236,6 +254,23 @@ function createVictoryPopup() {
   okButton.addEventListener("click", closePopup);
 }
 
+function createTemplatesPanel (_gameOptions) {
+  const templateContainer = document.createElement('div');
+  templateContainer.classList.add('template__container')
+  centralContainer.append(templateContainer);
 
+  const templateHeadline = document.createElement('div');
+  templateHeadline.classList.add("template__container-headline");
+  templateHeadline.textContent = 'Templates:'
+  templateContainer.append(templateHeadline);
+
+  for (let i = 0; i < 6; i++) {
+    const item = document.createElement('div');
+    
+    
+  }
+
+
+}
 
 console.log('Start');
