@@ -1,6 +1,7 @@
 body {
-  display: flex;
+  /* display: flex; */
 }
+
 .cell {
   display: flex;
   align-items: center;
@@ -11,38 +12,42 @@ body {
   color: #fff;
   border: 1px solid #ccc;
 }
+
+
+
+
+.game__container {
+  display: grid;
+  grid-template-areas: "empty top-panel""left-panel matrix";
+}
+.matrix__container {
+  grid-area: matrix;
+}
 .matrix__row {
   display: flex;
 }
-.closed-cell {
-
-
-}
-
-.matrix__container {
-  background-color: aqua;
-  width: 500px;
-  height: 500px;
-}
-
-
 .left-panel__container {
-  order: -1;
+  grid-area: left-panel;
+
   display: flex;
   flex-direction: column;
   align-items: end;
   background-color: red;
-  /* width: 100px; */
-  height: 500px;
+}
+.top-panel__container {
+  grid-area: top-panel;
+
+  display: flex;
+  align-items: end;
+  background-color: goldenrod;
 }
 .left-panel__row {
-  background-color: blue;
-  /* width: 500px; */
   display: flex;
-  /* flex-direction: row-reverse; */
-  /* height: 20px; */
 }
-.left-panel__cell {
+.top-panel__column {
+  
+}
+.panel__cell {
   display: flex;
   align-items: center;
   justify-content: center;
