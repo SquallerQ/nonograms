@@ -25,6 +25,7 @@ body {
   display: flex;
 }
 
+
 .game__container {
   display: grid;
   grid-template-areas: "empty top-panel""left-panel matrix";
@@ -70,21 +71,44 @@ body {
 
 
 
-
-
-
-
-.template__container {
-  width: 500px;
-  height: 500px;
+.left__container {
+  min-width: 300px;
+  min-height: 300px;
   background-color: aqua;
+}
+
+.difficult__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50px 30px;
+
+  
+  background-color: red;    
+}
+.difficult__button {
+  padding: 5px 18px;
+  gap: 5px;
+  background-color: #ccc;
+  cursor: pointer;
+}
+.difficult__button--active {
+  background-color: cornflowerblue;
+}
+.template__container {
+  /* min-width: 300px;
+  min-height: 300px;
+  background-color: aqua; */
 }
 .template__container-headline {
   color: #fff;
   background-color: #000;
 
 }
-
+.template__item {
+  background-color: antiquewhite;
+  text-transform: capitalize;
+}
 
 
 

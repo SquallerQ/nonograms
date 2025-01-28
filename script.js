@@ -15,19 +15,32 @@ const matrixTemplate = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ];
+
+const easyTemplates = ['easy', 'item1', 'item2','item3','item4','item5']
+const mediumTemplates = ['medium', 'item1', 'item2','item3','item4','item5']
+const hardTemplates = ['mushrooms', 'item1', 'item2','item3','item4','item5']
+
 let emptyMatrix = [];
 
 const gameOptions = {
   difficult: 'easy',
+  templateName: 'mushrooms'
 
 }
+
 const body = document.querySelector('body');
 
 const centralContainer = document.createElement("div");
 centralContainer.classList.add("central__container");
 body.append(centralContainer);
 
+const leftPanel = document.createElement("div");
+leftPanel.classList.add("left__container");
+centralContainer.append(leftPanel);
+
+createDifficultPanel()
 createTemplatesPanel(gameOptions);
+
 const gameContainer = document.createElement("div");
 gameContainer.classList.add("game__container");
 centralContainer.append(gameContainer);
@@ -255,22 +268,100 @@ function createVictoryPopup() {
 }
 
 function createTemplatesPanel (_gameOptions) {
-  const templateContainer = document.createElement('div');
-  templateContainer.classList.add('template__container')
-  centralContainer.append(templateContainer);
+  let templateContainer = document.querySelector(".template__container");
 
-  const templateHeadline = document.createElement('div');
-  templateHeadline.classList.add("template__container-headline");
-  templateHeadline.textContent = 'Templates:'
-  templateContainer.append(templateHeadline);
-
-  for (let i = 0; i < 6; i++) {
-    const item = document.createElement('div');
-    
-    
+  if (templateContainer) {
+    templateContainer.remove();
   }
 
+  templateContainer = document.createElement("div");
+  templateContainer.classList.add("template__container");
+  leftPanel.append(templateContainer);
+
+  const templateHeadline = document.createElement("div");
+  templateHeadline.classList.add("template__container-headline");
+  templateHeadline.textContent = "Templates:";
+  templateContainer.append(templateHeadline);
+
+  const gameDifficult = _gameOptions.difficult;
+
+  for (let i = 0; i < 6; i++) {
+    const item = document.createElement("div");
+    if (gameDifficult === "easy") {
+      item.textContent = easyTemplates[i];
+    } else if (gameDifficult === "medium") {
+      item.textContent = mediumTemplates[i];
+    } else if (gameDifficult === "hard") {
+      item.textContent = hardTemplates[i];
+    }
+    item.classList.add("template__item");
+    const templateName = item.textContent;
+    item.addEventListener("click", () =>
+      changeTemplate(gameDifficult, templateName)
+    );
+    templateContainer.append(item);
+  }
+}
+
+function createDifficultPanel () {
+  const difficultContainer = document.createElement("div");
+  difficultContainer.classList.add("difficult__container");
+  leftPanel.append(difficultContainer);
+
+  let templateName;
+
+  const easyButton = document.createElement("div");
+  easyButton.classList.add('difficult__button');
+  easyButton.classList.add('difficult__button--active');
+  easyButton.textContent = 'Easy';
+  easyButton.addEventListener("click", function () {
+    easyButton.classList.add('difficult__button--active');
+    mediumButton.classList.remove("difficult__button--active");
+    hardButton.classList.remove("difficult__button--active");
+
+    gameOptions.difficult = 'easy';
+    templateName = easyTemplates[0];
+    createTemplatesPanel(gameOptions);
+    changeTemplate(gameOptions.difficult, templateName);
+  });
+  const mediumButton = document.createElement("div");
+  mediumButton.classList.add("difficult__button");
+  mediumButton.textContent = "Medium";
+  mediumButton.addEventListener("click", function () {
+    easyButton.classList.remove("difficult__button--active");
+    mediumButton.classList.add("difficult__button--active");
+    hardButton.classList.remove("difficult__button--active");
+
+    gameOptions.difficult = "medium";
+    templateName = mediumTemplates[0];
+    createTemplatesPanel(gameOptions);
+    changeTemplate(gameOptions.difficult, templateName);
+  });
+
+  const hardButton = document.createElement("div");
+  hardButton.classList.add("difficult__button");
+  hardButton.textContent = 'Hard';
+  hardButton.addEventListener("click", function () {
+    easyButton.classList.remove("difficult__button--active");
+    mediumButton.classList.remove("difficult__button--active");
+    hardButton.classList.add("difficult__button--active");
+
+    gameOptions.difficult = "hard";
+    templateName = hardTemplates[0];
+    createTemplatesPanel(gameOptions);
+    changeTemplate(gameOptions.difficult, templateName);
+  });
+
+  difficultContainer.append(easyButton, mediumButton, hardButton);
 
 }
 
+function changeTemplate(_gameDifficult, _templateName) {
+  console.log(_gameDifficult);
+  console.log(_templateName);
+};
+
+
 console.log('Start');
+console.log(centralContainer);
+console.log(leftPanel);
