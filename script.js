@@ -1,43 +1,109 @@
-let matrixTemplate = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-];
-const templateObject = {
+const gameOptions = {
+  difficult: "easy",
+  selectedTemplate: "",
+};
+let matrixTemplate;
+
+const templatesObject = {
   easy: {
-    easy: [
-      [1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
-      [1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1],
-      [0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1],
-      [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-      [0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0],
-      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
-      [0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
+    smile: [
+      [1, 1, 0, 1, 1],
+      [1, 1, 0, 1, 1],
+      [0, 0, 0, 0, 0],
+      [1, 0, 0, 0, 1],
+      [0, 1, 1, 1, 0],
+    ],
+    airplane: [
+      [0, 0, 1, 0, 0],
+      [0, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1],
+      [0, 0, 1, 0, 0],
+      [0, 1, 1, 1, 0],
+    ],
+    tower: [
+      [1, 0, 1, 0, 1],
+      [1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 0],
+      [0, 1, 0, 1, 0],
+      [0, 1, 1, 1, 0],
+    ],
+    psy: [
+      [1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1],
+      [0, 1, 1, 1, 0],
+      [0, 0, 1, 0, 0],
+    ],
+    hourglass: [
+      [1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 0],
+      [0, 0, 1, 0, 0],
+      [0, 1, 0, 1, 0],
+      [1, 1, 1, 1, 1],
     ],
   },
-  medium: [
-    
-  ],
+  medium: {
+    televisor: [
+      [0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+      [0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 1, 1, 0, 0, 0, 0, 1, 1],
+      [1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 0, 0, 0, 0, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+    ],
+    note: [
+      [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 0, 0, 0, 1],
+      [0, 0, 0, 1, 0, 0, 0, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 1, 0, 0, 1],
+      [0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+      [0, 0, 0, 1, 0, 0, 0, 1, 1, 1],
+      [0, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+      [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+      [1, 1, 1, 1, 0, 0, 0, 1, 1, 0],
+      [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    cherry: [
+      [0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
+      [0, 0, 1, 1, 1, 1, 0, 1, 0, 0],
+      [0, 1, 0, 1, 0, 1, 1, 0, 1, 0],
+      [1, 1, 1, 0, 0, 1, 0, 1, 1, 1],
+      [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+      [0, 0, 1, 1, 1, 0, 1, 1, 1, 0],
+      [0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+      [0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+      [0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+      [0, 0, 1, 1, 1, 0, 1, 1, 1, 0],
+    ],
+    cup: [
+      [0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+      [0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+      [0, 1, 1, 0, 1, 1, 1, 1, 1, 1],
+      [0, 1, 1, 0, 1, 1, 1, 1, 0, 1],
+      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+      [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+      [1, 0, 1, 1, 1, 1, 1, 0, 0, 1],
+      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    ],
+    tree: [
+      [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
+      [0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+      [1, 1, 0, 1, 1, 1, 0, 0, 1, 1],
+      [1, 1, 1, 0, 1, 1, 1, 1, 1, 0],
+      [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
+      [0, 1, 0, 0, 1, 1, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ],
+  },
   hard: {
     mushrooms: [
       [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -72,24 +138,68 @@ const templateObject = {
       [0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
       [0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
-  ],
+    ],
+    home: [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
+      [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+      [0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+      [0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+      [0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0],
+      [0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0],
+      [0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0],
+      [0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ],
+    clover: [
+      [0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+      [0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0],
+      [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    duck: [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
+      [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+      [1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0],
+      [0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0],
+      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0],
+      [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+    ],
   },
 };
 
-
-const easyTemplates = ['easy', 'item1', 'item2','item3','item4','item5']
-const mediumTemplates = ['medium', 'item1', 'item2','item3','item4','item5']
-const hardTemplates = ['mushrooms', 'elk', 'item2','item3','item4','item5']
+const easyTemplates = ["smile", "airplane", "tower", "psy", "hourglass"];
+const mediumTemplates = ["televisor", "note", "cherry", "cup", "tree"];
+const hardTemplates = ["mushrooms", "elk", "home", "clover", "duck"];
 
 let emptyMatrix = [];
 
-const gameOptions = {
-  difficult: "easy",
-  // templateName: "mushrooms",
-  selectedTemplate: ''
-};
-
-const body = document.querySelector('body');
+const body = document.querySelector("body");
 
 const mainContainer = document.createElement("div");
 mainContainer.classList.add("main__container");
@@ -99,22 +209,17 @@ const leftPanel = document.createElement("div");
 leftPanel.classList.add("left__container");
 mainContainer.append(leftPanel);
 
-
-
-
 const gameContainer = document.createElement("div");
 gameContainer.classList.add("game__container");
 mainContainer.append(gameContainer);
 
-
-const matrixContainer = document.createElement('div');
-matrixContainer.classList.add('matrix__container')
+const matrixContainer = document.createElement("div");
+matrixContainer.classList.add("matrix__container");
 gameContainer.append(matrixContainer);
 
-
-matrixContainer.addEventListener('contextmenu', function(e) {
+matrixContainer.addEventListener("contextmenu", function (e) {
   e.preventDefault();
-})
+});
 
 const rightPanel = document.createElement("div");
 rightPanel.classList.add("right__container");
@@ -123,7 +228,9 @@ mainContainer.append(rightPanel);
 createDifficultPanel();
 createTemplatesPanel(gameOptions);
 
-function displayMatrix () {
+function displayMatrix() {
+  matrixContainer.innerHTML = "";
+
   emptyMatrix = createEmptyMatrix(matrixTemplate);
   for (let i = 0; i < emptyMatrix.length; i++) {
     const row = document.createElement("div");
@@ -144,8 +251,8 @@ function displayMatrix () {
 displayMatrix();
 
 function changeEmptyMatrix(event) {
-  event.preventDefault() 
- 
+  event.preventDefault();
+
   const clickedCell = event.target;
   if (clickedCell.classList.contains("cell")) {
     const row = clickedCell.closest(".matrix__row");
@@ -178,16 +285,15 @@ function changeEmptyMatrix(event) {
   compareMatrix(emptyMatrix);
 }
 
-
-function displayCountCellsLeft () {
+function displayCountCellsLeft() {
   let leftPanelContainer = document.querySelector(".count-cells__left-container");
-  if (leftPanelContainer) {      
+  if (leftPanelContainer) {
     leftPanelContainer.remove();
   }
-  leftPanelContainer = document.createElement('div')
+  leftPanelContainer = document.createElement("div");
   leftPanelContainer.classList.add("count-cells__left-container");
   gameContainer.append(leftPanelContainer);
-  
+
   for (let i = 0; i < matrixTemplate.length; i++) {
     const leftPanelRow = document.createElement("div");
     leftPanelRow.classList.add("count-cells__left-row");
@@ -197,20 +303,20 @@ function displayCountCellsLeft () {
     const matrixRow = matrixTemplate[i];
     let numberOfBlackCells = 0;
     let hasBlackCells = false;
-    
+
     for (let j = 0; j < matrixRow.length; j++) {
       if (matrixRow[j] > 0) {
         numberOfBlackCells = numberOfBlackCells + 1;
         hasBlackCells = true;
       }
-       if ((matrixRow[j] === 0 || j === matrixRow.length - 1) && numberOfBlackCells > 0) {
-         const leftPanelCell = document.createElement("div");
-         leftPanelCell.classList.add("count__cell");
-         leftPanelCell.innerText = numberOfBlackCells;
-         leftPanelRow.append(leftPanelCell);
+      if ((matrixRow[j] === 0 || j === matrixRow.length - 1) && numberOfBlackCells > 0) {
+        const leftPanelCell = document.createElement("div");
+        leftPanelCell.classList.add("count__cell");
+        leftPanelCell.innerText = numberOfBlackCells;
+        leftPanelRow.append(leftPanelCell);
 
-         numberOfBlackCells = 0;
-       }
+        numberOfBlackCells = 0;
+      }
     }
     if (!hasBlackCells) {
       const leftPanelCell = document.createElement("div");
@@ -220,7 +326,7 @@ function displayCountCellsLeft () {
     }
   }
 }
-displayCountCellsLeft()
+displayCountCellsLeft();
 
 function displayCountCellsTop() {
   let topPanelContainer = document.querySelector(".count-cells__top-container");
@@ -249,7 +355,7 @@ function displayCountCellsTop() {
         numberOfBlackCells = numberOfBlackCells + 1;
         hasBlackCells = true;
       }
-       if ((matrixColumn[j] === 0 || j === matrixColumn.length - 1) && numberOfBlackCells > 0) {
+      if ((matrixColumn[j] === 0 || j === matrixColumn.length - 1) && numberOfBlackCells > 0) {
         const topPanelCell = document.createElement("div");
         topPanelCell.classList.add("count__cell");
         topPanelCell.innerText = numberOfBlackCells;
@@ -268,7 +374,6 @@ function displayCountCellsTop() {
 }
 displayCountCellsTop();
 
-
 function rotateMatrix(matrix) {
   const rotatedMatrix = [];
   for (let col = 0; col < matrix[0].length; col++) {
@@ -280,9 +385,9 @@ function rotateMatrix(matrix) {
   }
   return rotatedMatrix;
 }
-function createEmptyMatrix (matrix) {
+function createEmptyMatrix(matrix) {
   const emptyMatrix = [];
-  
+
   for (let i = 0; i < matrix.length; i++) {
     const matrixRow = [];
     for (let j = 0; j < matrix[i].length; j++) {
@@ -292,9 +397,9 @@ function createEmptyMatrix (matrix) {
   }
   return emptyMatrix;
 }
-function compareMatrix (matrix) {
-  const matrixTemplateString = matrixTemplate.join(',');
-  const matrixPlayerClickedString = matrix.join(',');
+function compareMatrix(matrix) {
+  const matrixTemplateString = matrixTemplate.join(",");
+  const matrixPlayerClickedString = matrix.join(",");
   if (matrixTemplateString === matrixPlayerClickedString) {
     createVictoryPopup();
     matrixContainer.removeEventListener("click", changeEmptyMatrix);
@@ -303,7 +408,6 @@ function compareMatrix (matrix) {
 }
 
 function createVictoryPopup() {
-
   const popupContainer = document.createElement("div");
   popupContainer.classList.add("popup__container");
 
@@ -338,7 +442,7 @@ function createVictoryPopup() {
   okButton.addEventListener("click", closePopup);
 }
 
-function createTemplatesPanel (_gameOptions) {
+function createTemplatesPanel(_gameOptions) {
   let templateContainer = document.querySelector(".template__container");
 
   if (templateContainer) {
@@ -358,43 +462,40 @@ function createTemplatesPanel (_gameOptions) {
 
   let templates;
 
-    if (gameDifficult === "easy") {
-      templates = easyTemplates;
-    } else if (gameDifficult === "medium") {
-      templates = mediumTemplates;
-    } else if (gameDifficult === "hard") {
-      templates = hardTemplates;
+  if (gameDifficult === "easy") {
+    templates = easyTemplates;
+  } else if (gameDifficult === "medium") {
+    templates = mediumTemplates;
+  } else if (gameDifficult === "hard") {
+    templates = hardTemplates;
+  }
+  gameOptions.selectedTemplate = templates[0];
+
+  templates.forEach((templateName, index) => {
+    const item = document.createElement("div");
+    item.textContent = templateName;
+    item.classList.add("template__item");
+
+    if (index === 0) {
+      item.classList.add("template__item--active");
     }
-    gameOptions.selectedTemplate = templates[0]; 
-    
 
-    templates.forEach((templateName, index) => {
-      const item = document.createElement("div");
-      item.textContent = templateName;
-      item.classList.add("template__item");
+    item.addEventListener("click", () => {
+      const allItems = document.querySelectorAll(".template__item");
+      allItems.forEach((el) => el.classList.remove("template__item--active"));
 
-      if (index === 0) {
-        item.classList.add("template__item--active");
-      }
+      item.classList.add("template__item--active");
 
-      item.addEventListener("click", () => {
-        const allItems = document.querySelectorAll(".template__item")
-        allItems.forEach((el) =>
-          el.classList.remove("template__item--active")
-        );
+      gameOptions.selectedTemplate = templateName;
 
-        item.classList.add("template__item--active");
-
-        gameOptions.selectedTemplate = templateName;
-
-        changeTemplate(gameDifficult, templateName);
-      });
-      templateContainer.append(item);
+      changeTemplate(gameDifficult, templateName);
     });
+    templateContainer.append(item);
+  });
   changeTemplate(gameDifficult, templates[0]);
 }
 
-function createDifficultPanel () {
+function createDifficultPanel() {
   const difficultContainer = document.createElement("div");
   difficultContainer.classList.add("difficult__container");
   leftPanel.append(difficultContainer);
@@ -402,15 +503,15 @@ function createDifficultPanel () {
   let templateName;
 
   const easyButton = document.createElement("div");
-  easyButton.classList.add('difficult__button');
-  easyButton.classList.add('difficult__button--active');
-  easyButton.textContent = 'Easy';
+  easyButton.classList.add("difficult__button");
+  easyButton.classList.add("difficult__button--active");
+  easyButton.textContent = "Easy";
   easyButton.addEventListener("click", function () {
-    easyButton.classList.add('difficult__button--active');
+    easyButton.classList.add("difficult__button--active");
     mediumButton.classList.remove("difficult__button--active");
     hardButton.classList.remove("difficult__button--active");
 
-    gameOptions.difficult = 'easy';
+    gameOptions.difficult = "easy";
     templateName = easyTemplates[0];
     createTemplatesPanel(gameOptions);
     changeTemplate(gameOptions.difficult, templateName);
@@ -431,7 +532,7 @@ function createDifficultPanel () {
 
   const hardButton = document.createElement("div");
   hardButton.classList.add("difficult__button");
-  hardButton.textContent = 'Hard';
+  hardButton.textContent = "Hard";
   hardButton.addEventListener("click", function () {
     easyButton.classList.remove("difficult__button--active");
     mediumButton.classList.remove("difficult__button--active");
@@ -444,19 +545,17 @@ function createDifficultPanel () {
   });
 
   difficultContainer.append(easyButton, mediumButton, hardButton);
-
 }
 
 function changeTemplate(_gameDifficult, _templateName) {
-  let activeTemplate = templateObject[_gameDifficult][_templateName];
-  
+  let activeTemplate = templatesObject[_gameDifficult][_templateName];
+
   if (activeTemplate === undefined) {
-    activeTemplate = templateObject.hard.mushrooms;
-  } 
+    activeTemplate = templatesObject.hard.mushrooms;
+  }
 
   matrixTemplate = activeTemplate;
-  console.log(matrixTemplate);
-  
+
   for (let i = 0; i < emptyMatrix.length; i++) {
     for (let j = 0; j < emptyMatrix[i].length; j++) {
       emptyMatrix[i][j] = 0;
@@ -468,24 +567,26 @@ function changeTemplate(_gameDifficult, _templateName) {
       }
     }
   }
+  displayMatrix();
   displayCountCellsLeft();
   displayCountCellsTop();
 }
 
-function showSolution () {
-  const solutionButton = document.createElement('div');
-  solutionButton.classList.add('solution__button');
-  solutionButton.textContent = 'Show Solution'
+function showSolution() {
+  const solutionButton = document.createElement("div");
+  solutionButton.classList.add("solution__button");
+  solutionButton.textContent = "Show Solution";
 
-  solutionButton.addEventListener('click', () => {
-    const actualTemplate = templateObject[gameOptions.difficult][gameOptions.selectedTemplate];
+  solutionButton.addEventListener("click", () => {
+    const actualTemplate =
+      templatesObject[gameOptions.difficult][gameOptions.selectedTemplate];
 
     emptyMatrix = actualTemplate.map((row) => [...row]);
     updateMatrixOnDisplay();
-  })
+  });
   rightPanel.append(solutionButton);
 }
-showSolution()
+showSolution();
 
 function updateMatrixOnDisplay() {
   const matrixContainer = document.querySelector(".matrix__container");
@@ -504,3 +605,5 @@ function updateMatrixOnDisplay() {
     });
   });
 }
+
+
