@@ -1,6 +1,8 @@
 const gameOptions = {
   difficult: "easy",
   selectedTemplate: "",
+  isStarted: false,
+  inProcess: false,
 };
 let matrixTemplate;
 
@@ -225,8 +227,22 @@ const rightPanel = document.createElement("div");
 rightPanel.classList.add("right__container");
 mainContainer.append(rightPanel);
 
-createDifficultPanel();
-createTemplatesPanel(gameOptions);
+function startGame () {
+  createDifficultPanel();
+  createTemplatesPanel(gameOptions);
+
+  displayCountCellsLeft();
+  displayCountCellsTop();
+  displayMatrix();
+}
+startGame()
+
+function rightPanelButtons () {
+  showSolutionButton();
+  addTimerOnPage();
+}
+rightPanelButtons()
+
 
 function displayMatrix() {
   matrixContainer.innerHTML = "";
@@ -248,7 +264,7 @@ function displayMatrix() {
   matrixContainer.addEventListener("click", changeEmptyMatrix);
   matrixContainer.addEventListener("contextmenu", changeEmptyMatrix);
 }
-displayMatrix();
+
 
 function changeEmptyMatrix(event) {
   event.preventDefault();
@@ -283,6 +299,8 @@ function changeEmptyMatrix(event) {
     return;
   }
   compareMatrix(emptyMatrix);
+  gameOptions.isStarted = true;
+  changeGameStatus()
 }
 
 function displayCountCellsLeft() {
@@ -326,7 +344,7 @@ function displayCountCellsLeft() {
     }
   }
 }
-displayCountCellsLeft();
+
 
 function displayCountCellsTop() {
   let topPanelContainer = document.querySelector(".count-cells__top-container");
@@ -372,7 +390,7 @@ function displayCountCellsTop() {
     }
   }
 }
-displayCountCellsTop();
+
 
 function rotateMatrix(matrix) {
   const rotatedMatrix = [];
@@ -405,41 +423,6 @@ function compareMatrix(matrix) {
     matrixContainer.removeEventListener("click", changeEmptyMatrix);
     matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
   }
-}
-
-function createVictoryPopup() {
-  const popupContainer = document.createElement("div");
-  popupContainer.classList.add("popup__container");
-
-  const popupContent = document.createElement("div");
-  popupContent.classList.add("popup__content");
-
-  const closeButton = document.createElement("div");
-  closeButton.classList.add("popup__close-button");
-  closeButton.innerHTML = "&times;";
-
-  const victoryMessage = document.createElement("p");
-  victoryMessage.classList.add("popup__message");
-  victoryMessage.textContent = "You won";
-
-  const timeTaken = document.createElement("p");
-  timeTaken.classList.add("popup__time");
-  timeTaken.textContent = "Time: 00:00";
-
-  const okButton = document.createElement("div");
-  okButton.classList.add("popup__ok-button");
-  okButton.textContent = "OK";
-
-  popupContent.append(closeButton, victoryMessage, timeTaken, okButton);
-  popupContainer.append(popupContent);
-  document.body.append(popupContainer);
-
-  function closePopup() {
-    popupContainer.remove();
-  }
-
-  closeButton.addEventListener("click", closePopup);
-  okButton.addEventListener("click", closePopup);
 }
 
 function createTemplatesPanel(_gameOptions) {
@@ -481,15 +464,42 @@ function createTemplatesPanel(_gameOptions) {
     }
 
     item.addEventListener("click", () => {
-      const allItems = document.querySelectorAll(".template__item");
-      allItems.forEach((el) => el.classList.remove("template__item--active"));
+      if (gameOptions.isStarted === false) {
+        const allItems = document.querySelectorAll(".template__item");
+        allItems.forEach((el) => el.classList.remove("template__item--active"));
 
-      item.classList.add("template__item--active");
+        item.classList.add("template__item--active");
 
-      gameOptions.selectedTemplate = templateName;
+        gameOptions.selectedTemplate = templateName;
 
-      changeTemplate(gameDifficult, templateName);
+        changeTemplate(gameDifficult, templateName);        
+      } else if (gameOptions.isStarted === true && item.textContent === gameOptions.selectedTemplate) {
+        console.log(true, item.textContent);
+      } else {
+        async function abortGame() {
+          const userDecision = await showWarningPopup("Are you want to change the template? Your progress will be lost.");
+          if (userDecision === true) {
+            const allItems = document.querySelectorAll(".template__item");
+            allItems.forEach((el) => el.classList.remove("template__item--active"));
+              
+            item.classList.add("template__item--active");
+              
+            gameOptions.selectedTemplate = templateName;
+              
+            changeTemplate(gameDifficult, templateName);
+            
+            gameOptions.isStarted = false;
+            gameOptions.inProcess = false;
+            resetTimer();
+          } else {
+            return;
+          }
+        }
+        abortGame();
+      }
+      
     });
+      
     templateContainer.append(item);
   });
   changeTemplate(gameDifficult, templates[0]);
@@ -507,41 +517,112 @@ function createDifficultPanel() {
   easyButton.classList.add("difficult__button--active");
   easyButton.textContent = "Easy";
   easyButton.addEventListener("click", function () {
-    easyButton.classList.add("difficult__button--active");
-    mediumButton.classList.remove("difficult__button--active");
-    hardButton.classList.remove("difficult__button--active");
+    if (gameOptions.isStarted === false && gameOptions.difficult !== "easy") {
+      easyButton.classList.add("difficult__button--active");
+      mediumButton.classList.remove("difficult__button--active");
+      hardButton.classList.remove("difficult__button--active");
 
-    gameOptions.difficult = "easy";
-    templateName = easyTemplates[0];
-    createTemplatesPanel(gameOptions);
-    changeTemplate(gameOptions.difficult, templateName);
+      gameOptions.difficult = "easy";
+      templateName = easyTemplates[0];
+      createTemplatesPanel(gameOptions);
+      changeTemplate(gameOptions.difficult, templateName);
+    } else if (gameOptions.isStarted === true && gameOptions.difficult === "easy") {
+      return;
+    } else {
+      async function abortGame() {
+        const userDecision = await showWarningPopup("Are you want to change the difficulty? Your progress will be lost.");
+        if (userDecision === true) {
+          easyButton.classList.add("difficult__button--active");
+          mediumButton.classList.remove("difficult__button--active");
+          hardButton.classList.remove("difficult__button--active");
+
+          gameOptions.difficult = "easy";
+          templateName = easyTemplates[0];
+          createTemplatesPanel(gameOptions);
+          changeTemplate(gameOptions.difficult, templateName);
+          gameOptions.isStarted = false;
+          gameOptions.inProcess = false;
+          resetTimer();
+        } else {
+          return;
+        }
+      }
+      abortGame();
+    }
   });
   const mediumButton = document.createElement("div");
   mediumButton.classList.add("difficult__button");
   mediumButton.textContent = "Medium";
   mediumButton.addEventListener("click", function () {
-    easyButton.classList.remove("difficult__button--active");
-    mediumButton.classList.add("difficult__button--active");
-    hardButton.classList.remove("difficult__button--active");
+    if (gameOptions.isStarted === false) {
+      easyButton.classList.remove("difficult__button--active");
+      mediumButton.classList.add("difficult__button--active");
+      hardButton.classList.remove("difficult__button--active");
 
-    gameOptions.difficult = "medium";
-    templateName = mediumTemplates[0];
-    createTemplatesPanel(gameOptions);
-    changeTemplate(gameOptions.difficult, templateName);
+      gameOptions.difficult = "medium";
+      templateName = mediumTemplates[0];
+      createTemplatesPanel(gameOptions);
+      changeTemplate(gameOptions.difficult, templateName);
+    } else if (gameOptions.isStarted === true && gameOptions.difficult === "medium") {
+      return;
+    } else {
+      async function abortGame() {
+        const userDecision = await showWarningPopup("Are you want to change the difficulty? Your progress will be lost.");
+        if (userDecision === true) {
+          easyButton.classList.remove("difficult__button--active");
+          mediumButton.classList.add("difficult__button--active");
+          hardButton.classList.remove("difficult__button--active");
+          gameOptions.difficult = "medium";
+          templateName = mediumTemplates[0];
+          createTemplatesPanel(gameOptions);
+          changeTemplate(gameOptions.difficult, templateName);
+          gameOptions.isStarted = false;
+          gameOptions.inProcess = false;
+          resetTimer();
+        } else {
+          return;
+        }
+      }
+      abortGame();
+    }
   });
 
   const hardButton = document.createElement("div");
   hardButton.classList.add("difficult__button");
   hardButton.textContent = "Hard";
   hardButton.addEventListener("click", function () {
-    easyButton.classList.remove("difficult__button--active");
-    mediumButton.classList.remove("difficult__button--active");
-    hardButton.classList.add("difficult__button--active");
+    if (gameOptions.isStarted === false) {
+      easyButton.classList.remove("difficult__button--active");
+      mediumButton.classList.remove("difficult__button--active");
+      hardButton.classList.add("difficult__button--active");
 
-    gameOptions.difficult = "hard";
-    templateName = hardTemplates[0];
-    createTemplatesPanel(gameOptions);
-    changeTemplate(gameOptions.difficult, templateName);
+      gameOptions.difficult = "hard";
+      templateName = hardTemplates[0];
+      createTemplatesPanel(gameOptions);
+      changeTemplate(gameOptions.difficult, templateName);
+    } else if (gameOptions.isStarted === true && gameOptions.difficult === "hard") {
+      return;
+    } else {
+      async function abortGame() {
+        const userDecision = await showWarningPopup("Are you want to change the difficulty? Your progress will be lost.");
+        if (userDecision === true) {
+          easyButton.classList.remove("difficult__button--active");
+          mediumButton.classList.remove("difficult__button--active");
+          hardButton.classList.add("difficult__button--active");
+          gameOptions.difficult = "hard";
+
+          templateName = hardTemplates[0];
+          createTemplatesPanel(gameOptions);
+          changeTemplate(gameOptions.difficult, templateName);
+          gameOptions.isStarted = false;
+          gameOptions.inProcess = false;
+          resetTimer();
+        } else {
+          return;
+        }
+      }
+      abortGame();
+    }
   });
 
   difficultContainer.append(easyButton, mediumButton, hardButton);
@@ -572,7 +653,7 @@ function changeTemplate(_gameDifficult, _templateName) {
   displayCountCellsTop();
 }
 
-function showSolution() {
+function showSolutionButton() {
   const solutionButton = document.createElement("div");
   solutionButton.classList.add("solution__button");
   solutionButton.textContent = "Show Solution";
@@ -586,7 +667,7 @@ function showSolution() {
   });
   rightPanel.append(solutionButton);
 }
-showSolution();
+
 
 function updateMatrixOnDisplay() {
   const matrixContainer = document.querySelector(".matrix__container");
@@ -599,7 +680,7 @@ function updateMatrixOnDisplay() {
         if (cell === 1) {
           cells[cellIndex].classList.add("cell-active");
         } else {
-          cells[cellIndex].classList.remove("cell-active");
+          cells[cellIndex].classList.remove("cell-active", "cell-cross");
         }
       }
     });
@@ -607,3 +688,156 @@ function updateMatrixOnDisplay() {
 }
 
 
+let timerInterval;
+let timePassed = 0;
+let isPaused = false; 
+
+function addTimerOnPage() {
+  timer = document.createElement("div");
+  timer.classList.add("timer");
+  timer.innerHTML = "00:00";
+  rightPanel.append(timer);
+}
+
+function startTimer() {
+  const timer = document.querySelector(".timer");
+
+ 
+
+  timerInterval = setInterval(() => {
+    if (isPaused === false) {
+    timePassed++;
+    const minutes = Math.floor(timePassed / 60).toString().padStart(2, "0");
+    const seconds = (timePassed % 60).toString().padStart(2, "0");
+    timer.innerHTML = `${minutes}:${seconds}`;
+    }
+  }, 1000);
+}
+function pauseTimer() {
+  isPaused = true;
+}
+
+function resumeTimer() {
+  isPaused = false;
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timePassed = 0;
+
+  const timer = document.querySelector('.timer')
+  timer.innerHTML = '00:00'
+}
+
+
+
+
+function changeGameStatus() {
+  if (gameOptions.isStarted === true && gameOptions.inProcess === false) {
+    startTimer();
+    console.log(true);
+    
+    gameOptions.inProcess = true;
+  } else if (gameOptions.isStarted === true && gameOptions.inProcess === true) {
+    return;
+  }
+}
+
+
+
+
+
+
+
+function createVictoryPopup() {
+  const popupContainer = document.createElement("div");
+  popupContainer.classList.add("popup__container");
+
+  const popupContent = document.createElement("div");
+  popupContent.classList.add("popup__content");
+
+  const closeButton = document.createElement("div");
+  closeButton.classList.add("popup__close-button");
+  closeButton.innerHTML = "&times;";
+
+  const victoryMessage = document.createElement("p");
+  victoryMessage.classList.add("popup__message");
+  victoryMessage.textContent = "You won";
+
+  const timeTaken = document.createElement("p");
+  timeTaken.classList.add("popup__time");
+  timeTaken.textContent = "Time: 00:00";
+
+  const okButton = document.createElement("div");
+  okButton.classList.add("popup__ok-button");
+  okButton.textContent = "OK";
+
+  popupContent.append(closeButton, victoryMessage, timeTaken, okButton);
+  popupContainer.append(popupContent);
+  document.body.append(popupContainer);
+
+  function closePopup() {
+    popupContainer.remove();
+  }
+
+  closeButton.addEventListener("click", closePopup);
+  okButton.addEventListener("click", closePopup);
+}
+
+function showWarningPopup(message = 'You sure?') {
+  return new Promise((resolve) => {
+  pauseTimer();
+  
+  const popupContainer = document.createElement("div");
+  popupContainer.classList.add("popup__container");
+
+  const popupContent = document.createElement("div");
+  popupContent.classList.add("popup__content");
+
+  const popupMessage = document.createElement("p");
+  popupMessage.classList.add("popup__message");
+  popupMessage.innerText = message;
+
+  const buttonsContainer = document.createElement("div");
+  buttonsContainer.classList.add("popup__buttons");
+
+  const closeButton = document.createElement("div");
+  closeButton.classList.add("popup__close-button");
+  closeButton.innerHTML = "&times;";
+
+  const okButton = document.createElement("div");
+  okButton.classList.add("popup__ok-button");
+  okButton.textContent = "OK";
+
+  okButton.addEventListener("click", () => {
+    closePopup();
+    resolve(true);
+  });
+
+  const cancelButton = document.createElement("div");
+  cancelButton.classList.add("popup__cancel-button");
+  cancelButton.textContent = "Cancel";
+
+  cancelButton.addEventListener("click", () => {
+    closePopup();
+    resolve(false);
+  });
+  closeButton.addEventListener("click", () => {
+    closePopup();
+    resolve(false);
+  });
+
+
+  buttonsContainer.append(okButton, cancelButton);
+  popupContent.append(closeButton, popupMessage, buttonsContainer);
+  popupContainer.append(popupContent);
+  document.body.appendChild(popupContainer);
+
+  function closePopup() {
+    popupContainer.remove();
+    resumeTimer(); 
+  }
+
+  });
+}
+// showWarningPopup()
