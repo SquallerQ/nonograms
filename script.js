@@ -1,6 +1,6 @@
 const gameOptions = {
   difficult: "easy",
-  selectedTemplate: "",
+  selectedTemplate: "smile",
   isStarted: false,
   inProcess: false,
   isSolution: false
@@ -236,7 +236,7 @@ mainContainer.append(rightPanel);
 
 function startGame () {
   createDifficultPanel();
-  createTemplatesPanel(gameOptions);
+  createTemplatesPanel();
 
   displayCountCellsLeft();
   displayCountCellsTop();
@@ -248,6 +248,7 @@ function rightPanelButtons () {
   showSolutionButton();
   addTimerOnPage();
   resetGameButton();
+  randomGameButton();
 }
 rightPanelButtons()
 
@@ -433,7 +434,7 @@ function compareMatrix(matrix) {
   }
 }
 
-function createTemplatesPanel(_gameOptions) {
+function createTemplatesPanel(_gameDifficult, _gameTemplate) { 
   let templateContainer = document.querySelector(".template__container");
 
   if (templateContainer) {
@@ -449,7 +450,12 @@ function createTemplatesPanel(_gameOptions) {
   templateHeadline.textContent = "Templates:";
   templateContainer.append(templateHeadline);
 
-  const gameDifficult = _gameOptions.difficult;
+  let gameDifficult;
+  if (_gameDifficult === undefined) {
+    gameDifficult = gameOptions.difficult;
+  } else {
+    gameDifficult = _gameDifficult;
+  }
 
   let templates;
 
@@ -460,14 +466,16 @@ function createTemplatesPanel(_gameOptions) {
   } else if (gameDifficult === "hard") {
     templates = hardTemplates;
   }
-  gameOptions.selectedTemplate = templates[0];
+  if (_gameTemplate === false || !templates.includes(_gameTemplate)) {
+    _gameTemplate = templates[0];
+  }
 
-  templates.forEach((templateName, index) => {
+  templates.forEach((templateName) => {
     const item = document.createElement("div");
     item.textContent = templateName;
     item.classList.add("template__item");
-
-    if (index === 0) {
+ 
+    if (templateName === _gameTemplate) {
       item.classList.add("template__item--active");
     }
 
@@ -480,22 +488,29 @@ function createTemplatesPanel(_gameOptions) {
 
         gameOptions.selectedTemplate = templateName;
 
-        changeTemplate(gameDifficult, templateName);        
+        gameOptions.isSolution = false;
+        gameToggler();
+
+        changeTemplate(gameDifficult, templateName);
       } else if (gameOptions.isStarted === true && item.textContent === gameOptions.selectedTemplate) {
         console.log(true, item.textContent);
       } else {
         async function abortGame() {
-          const userDecision = await showWarningPopup("Are you want to change the template? Your progress will be lost.");
+          const userDecision = await showWarningPopup(
+            "Are you want to change the template? Your progress will be lost."
+          );
           if (userDecision === true) {
             const allItems = document.querySelectorAll(".template__item");
-            allItems.forEach((el) => el.classList.remove("template__item--active"));
-              
+            allItems.forEach((el) =>
+              el.classList.remove("template__item--active")
+            );
+
             item.classList.add("template__item--active");
-              
+
             gameOptions.selectedTemplate = templateName;
-              
+
             changeTemplate(gameDifficult, templateName);
-            
+
             gameOptions.isStarted = false;
             gameOptions.inProcess = false;
             gameOptions.isSolution = false;
@@ -507,9 +522,8 @@ function createTemplatesPanel(_gameOptions) {
         }
         abortGame();
       }
-      
     });
-      
+
     templateContainer.append(item);
   });
   changeTemplate(gameDifficult, templates[0]);
@@ -534,7 +548,12 @@ function createDifficultPanel() {
 
       gameOptions.difficult = "easy";
       templateName = easyTemplates[0];
-      createTemplatesPanel(gameOptions);
+      gameOptions.selectedTemplate = templateName;
+
+      gameOptions.isSolution = false;
+      gameToggler();
+
+      createTemplatesPanel();
       changeTemplate(gameOptions.difficult, templateName);
     } else if (gameOptions.isStarted === true && gameOptions.difficult === "easy") {
       return;
@@ -548,7 +567,8 @@ function createDifficultPanel() {
 
           gameOptions.difficult = "easy";
           templateName = easyTemplates[0];
-          createTemplatesPanel(gameOptions);
+          gameOptions.selectedTemplate = templateName;
+          createTemplatesPanel();
           changeTemplate(gameOptions.difficult, templateName);
           gameOptions.isStarted = false;
           gameOptions.inProcess = false;
@@ -573,7 +593,12 @@ function createDifficultPanel() {
 
       gameOptions.difficult = "medium";
       templateName = mediumTemplates[0];
-      createTemplatesPanel(gameOptions);
+      gameOptions.selectedTemplate = templateName;
+
+      gameOptions.isSolution = false;
+      gameToggler();
+
+      createTemplatesPanel();
       changeTemplate(gameOptions.difficult, templateName);
     } else if (gameOptions.isStarted === true && gameOptions.difficult === "medium") {
       return;
@@ -586,7 +611,8 @@ function createDifficultPanel() {
           hardButton.classList.remove("difficult__button--active");
           gameOptions.difficult = "medium";
           templateName = mediumTemplates[0];
-          createTemplatesPanel(gameOptions);
+          gameOptions.selectedTemplate = templateName;
+          createTemplatesPanel();
           changeTemplate(gameOptions.difficult, templateName);
           gameOptions.isStarted = false;
           gameOptions.inProcess = false;
@@ -612,7 +638,12 @@ function createDifficultPanel() {
 
       gameOptions.difficult = "hard";
       templateName = hardTemplates[0];
-      createTemplatesPanel(gameOptions);
+
+      gameOptions.selectedTemplate = templateName;
+      gameOptions.isSolution = false;
+      gameToggler();
+
+      createTemplatesPanel();
       changeTemplate(gameOptions.difficult, templateName);
     } else if (gameOptions.isStarted === true && gameOptions.difficult === "hard") {
       return;
@@ -626,7 +657,8 @@ function createDifficultPanel() {
           gameOptions.difficult = "hard";
 
           templateName = hardTemplates[0];
-          createTemplatesPanel(gameOptions);
+          gameOptions.selectedTemplate = templateName;
+          createTemplatesPanel();
           changeTemplate(gameOptions.difficult, templateName);
           gameOptions.isStarted = false;
           gameOptions.inProcess = false;
@@ -682,6 +714,8 @@ function showSolutionButton() {
       updateMatrixOnDisplay();
       matrixContainer.removeEventListener("click", changeEmptyMatrix);
       matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
+      gameOptions.isSolution = true;
+      gameToggler();
     } else {
       async function abort() {
         const userDecision = await showWarningPopup("Are you want to show the solution? Your progress will be lost.");
@@ -797,6 +831,106 @@ function resetGameButton () {
   rightPanel.append(resetGameButton);  
 }
 
+function randomGameButton() {
+  const randomGameButton = document.createElement("div");
+  randomGameButton.classList.add("random__button");
+  randomGameButton.textContent = "Random Game";
+
+  randomGameButton.addEventListener("click", () => {
+    if (gameOptions.isStarted === false) {      
+      const activeDifficultButton = document.querySelector('.difficult__button--active');
+      activeDifficultButton.classList.remove('difficult__button--active');
+
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+      }
+      
+      let randomDifficultIndex = getRandomInt(3);
+
+      let templates
+      let nameOfTemplate
+      let currentTemplateIndex;
+
+      if (randomDifficultIndex === 0) {
+        templates = easyTemplates;
+      } else if (randomDifficultIndex === 1) {
+        templates = mediumTemplates;
+      } else {
+        templates = hardTemplates;
+      }
+
+      currentTemplateIndex = templates.indexOf(gameOptions.selectedTemplate);
+
+      let nextTemplateIndex = (currentTemplateIndex + 1) % templates.length;
+      nameOfTemplate = templates[nextTemplateIndex];
+
+      const difficultButtons = document.querySelectorAll(".difficult__button");
+      difficultButtons[randomDifficultIndex].classList.add("difficult__button--active");
+
+      const getDifficult = difficultButtons[randomDifficultIndex].textContent.toLowerCase();
+      
+      gameOptions.difficult = getDifficult;
+      gameOptions.selectedTemplate = nameOfTemplate;
+      gameOptions.isSolution = false;
+
+      gameToggler();
+      createTemplatesPanel(getDifficult, nameOfTemplate);
+      updateMatrixOnDisplay();
+    } else {
+      async function abort() {
+        const userDecision = await showWarningPopup("Are you want to choose a random template? Your progress will be lost.");
+        if (userDecision === true) {
+          const activeDifficultButton = document.querySelector('.difficult__button--active');
+          activeDifficultButton.classList.remove('difficult__button--active');
+
+          function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+          }
+
+          let randomDifficultIndex = getRandomInt(3);
+        
+          let templates
+          let nameOfTemplate
+          let currentTemplateIndex;
+        
+          if (randomDifficultIndex === 0) {
+            templates = easyTemplates;
+          } else if (randomDifficultIndex === 1) {
+            templates = mediumTemplates;
+          } else {
+            templates = hardTemplates;
+          }
+        
+          currentTemplateIndex = templates.indexOf(gameOptions.selectedTemplate);
+        
+          let nextTemplateIndex = (currentTemplateIndex + 1) % templates.length;
+          nameOfTemplate = templates[nextTemplateIndex];
+
+          const difficultButtons = document.querySelectorAll(".difficult__button");
+          difficultButtons[randomDifficultIndex].classList.add("difficult__button--active");
+
+          const getDifficult = difficultButtons[randomDifficultIndex].textContent.toLowerCase();
+
+          gameOptions.difficult = getDifficult;
+          gameOptions.selectedTemplate = nameOfTemplate;
+
+          gameOptions.isStarted = false;
+          gameOptions.inProcess = false;
+          gameOptions.isSolution = false;
+          gameToggler();
+          resetTimer();
+
+          createTemplatesPanel(getDifficult, nameOfTemplate);
+          updateMatrixOnDisplay();
+        } else {
+          return;
+        }
+      }
+      abort();
+    }
+  });
+  rightPanel.append(randomGameButton);
+}
 
 
 function gameToggler() {
@@ -820,6 +954,12 @@ function gameToggler() {
       
     }    
   }
+
+  if (gameOptions.isSolution === true) {
+    resetGameButton.classList.add("reset__button-active");
+    
+  }
+
 }
 
 

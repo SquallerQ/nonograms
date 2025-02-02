@@ -154,7 +154,16 @@ body {
 .reset__button-active {
   background-color: sandybrown;
 }
+.random__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
+  background-color: darkcyan;
+  padding: 10px 15px;
+
+  cursor: pointer;
+}
 
 
 
