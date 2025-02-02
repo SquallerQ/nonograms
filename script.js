@@ -3,6 +3,7 @@ const gameOptions = {
   selectedTemplate: "",
   isStarted: false,
   inProcess: false,
+  isSolution: false
 };
 let matrixTemplate;
 
@@ -199,7 +200,13 @@ const easyTemplates = ["smile", "airplane", "tower", "psy", "hourglass"];
 const mediumTemplates = ["televisor", "note", "cherry", "cup", "tree"];
 const hardTemplates = ["mushrooms", "elk", "home", "clover", "duck"];
 
+// matrix for game
 let emptyMatrix = [];
+
+// for timer
+let timerInterval;
+let timePassed = 0;
+let isPaused = false; 
 
 const body = document.querySelector("body");
 
@@ -240,6 +247,7 @@ startGame()
 function rightPanelButtons () {
   showSolutionButton();
   addTimerOnPage();
+  resetGameButton();
 }
 rightPanelButtons()
 
@@ -300,7 +308,7 @@ function changeEmptyMatrix(event) {
   }
   compareMatrix(emptyMatrix);
   gameOptions.isStarted = true;
-  changeGameStatus()
+  gameToggler()
 }
 
 function displayCountCellsLeft() {
@@ -490,7 +498,9 @@ function createTemplatesPanel(_gameOptions) {
             
             gameOptions.isStarted = false;
             gameOptions.inProcess = false;
+            gameOptions.isSolution = false;
             resetTimer();
+            gameToggler();
           } else {
             return;
           }
@@ -542,6 +552,8 @@ function createDifficultPanel() {
           changeTemplate(gameOptions.difficult, templateName);
           gameOptions.isStarted = false;
           gameOptions.inProcess = false;
+          gameOptions.isSolution = false;
+          gameToggler();
           resetTimer();
         } else {
           return;
@@ -578,6 +590,8 @@ function createDifficultPanel() {
           changeTemplate(gameOptions.difficult, templateName);
           gameOptions.isStarted = false;
           gameOptions.inProcess = false;
+          gameOptions.isSolution = false;
+          gameToggler();
           resetTimer();
         } else {
           return;
@@ -616,6 +630,8 @@ function createDifficultPanel() {
           changeTemplate(gameOptions.difficult, templateName);
           gameOptions.isStarted = false;
           gameOptions.inProcess = false;
+          gameOptions.isSolution = false;
+          gameToggler();
           resetTimer();
         } else {
           return;
@@ -659,15 +675,43 @@ function showSolutionButton() {
   solutionButton.textContent = "Show Solution";
 
   solutionButton.addEventListener("click", () => {
-    const actualTemplate =
-      templatesObject[gameOptions.difficult][gameOptions.selectedTemplate];
 
-    emptyMatrix = actualTemplate.map((row) => [...row]);
-    updateMatrixOnDisplay();
+    if (gameOptions.isStarted === false) {
+      const actualTemplate = templatesObject[gameOptions.difficult][gameOptions.selectedTemplate];
+      emptyMatrix = actualTemplate.map((row) => [...row]);
+      updateMatrixOnDisplay();
+      matrixContainer.removeEventListener("click", changeEmptyMatrix);
+      matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
+    } else {
+      async function abort() {
+        const userDecision = await showWarningPopup("Are you want to show the solution? Your progress will be lost.");
+        if (userDecision === true) {
+          const actualTemplate = templatesObject[gameOptions.difficult][gameOptions.selectedTemplate];
+          emptyMatrix = actualTemplate.map((row) => [...row]);
+          updateMatrixOnDisplay();
+          gameOptions.isStarted = false;
+          gameOptions.inProcess = false;
+          gameOptions.isSolution = true;
+          resetTimer();
+          gameToggler();
+          matrixContainer.removeEventListener("click", changeEmptyMatrix);
+          matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
+        } else {
+          return;
+        }
+      }
+      abort()
+    }
   });
   rightPanel.append(solutionButton);
 }
-
+function clearMatrix() {
+  for (let i = 0; i < emptyMatrix.length; i++) {
+    for (let j = 0; j < emptyMatrix[i].length; j++) {
+      emptyMatrix[i][j] = 0;
+    }
+  }
+}
 
 function updateMatrixOnDisplay() {
   const matrixContainer = document.querySelector(".matrix__container");
@@ -687,11 +731,6 @@ function updateMatrixOnDisplay() {
   });
 }
 
-
-let timerInterval;
-let timePassed = 0;
-let isPaused = false; 
-
 function addTimerOnPage() {
   timer = document.createElement("div");
   timer.classList.add("timer");
@@ -701,8 +740,6 @@ function addTimerOnPage() {
 
 function startTimer() {
   const timer = document.querySelector(".timer");
-
- 
 
   timerInterval = setInterval(() => {
     if (isPaused === false) {
@@ -729,17 +766,59 @@ function resetTimer() {
   timer.innerHTML = '00:00'
 }
 
+function resetGameButton () {
+  const resetGameButton = document.createElement("div");
+  resetGameButton.classList.add("reset__button");
+  resetGameButton.textContent = "Reset Game";
+
+  resetGameButton.addEventListener("click", () => {
+    if (gameOptions.isStarted === false && gameOptions.isSolution === false) {
+      return;
+    } else {
+      async function abort() {
+        const userDecision = await showWarningPopup("Are you want to reset the game? Your progress will be lost.");
+        if (userDecision === true) {                
+          clearMatrix();
+          updateMatrixOnDisplay();
+          gameOptions.isStarted = false;
+          gameOptions.inProcess = false;
+          gameOptions.isSolution = false;
+          resetTimer();
+          gameToggler();
+          matrixContainer.addEventListener("click", changeEmptyMatrix);
+          matrixContainer.addEventListener("contextmenu", changeEmptyMatrix);
+        } else {
+          return;
+        }
+      }
+      abort();
+    }
+  });
+  rightPanel.append(resetGameButton);  
+}
 
 
 
-function changeGameStatus() {
+function gameToggler() {
+  const resetGameButton = document.querySelector(".reset__button");
   if (gameOptions.isStarted === true && gameOptions.inProcess === false) {
     startTimer();
-    console.log(true);
     
     gameOptions.inProcess = true;
+    console.log('a');
+    
+    if (resetGameButton) {      
+      resetGameButton.classList.add("reset__button-active");
+    }    
   } else if (gameOptions.isStarted === true && gameOptions.inProcess === true) {
     return;
+  } else if (gameOptions.isStarted === false && gameOptions.inProcess === false && gameOptions.isSolution === false) {
+    if (resetGameButton) {
+      
+      resetGameButton.classList.remove("reset__button-active");
+      console.log('b');
+      
+    }    
   }
 }
 

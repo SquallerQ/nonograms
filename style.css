@@ -141,8 +141,19 @@ body {
   background-color: chocolate;
   padding: 10px 15px;
 }
+.reset__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
+  background-color: hotpink;
+  padding: 10px 15px;
 
+  cursor: pointer;
+}
+.reset__button-active {
+  background-color: sandybrown;
+}
 
 
 
