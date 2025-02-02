@@ -207,6 +207,7 @@ let emptyMatrix = [];
 let timerInterval;
 let timePassed = 0;
 let isPaused = false; 
+let isLoaded = false;
 
 const body = document.querySelector("body");
 
@@ -249,6 +250,8 @@ function rightPanelButtons () {
   addTimerOnPage();
   resetGameButton();
   randomGameButton();
+  saveGameButton();
+  loadGameButton();
 }
 rightPanelButtons()
 
@@ -302,7 +305,7 @@ function changeEmptyMatrix(event) {
       } else if (clickedCell.classList.contains("cell-cross")) {
         clickedCell.classList.remove("cell-cross");
       }
-      emptyMatrix[rowNumber][cellNumber] = 0;
+      emptyMatrix[rowNumber][cellNumber] = -1;
     }
   } else {
     return;
@@ -489,6 +492,7 @@ function createTemplatesPanel(_gameDifficult, _gameTemplate) {
         gameOptions.selectedTemplate = templateName;
 
         gameOptions.isSolution = false;
+        isLoaded = false;
         gameToggler();
 
         changeTemplate(gameDifficult, templateName);
@@ -514,6 +518,9 @@ function createTemplatesPanel(_gameDifficult, _gameTemplate) {
             gameOptions.isStarted = false;
             gameOptions.inProcess = false;
             gameOptions.isSolution = false;
+            isLoaded = false;
+            console.log('tut');
+            
             resetTimer();
             gameToggler();
           } else {
@@ -526,7 +533,7 @@ function createTemplatesPanel(_gameDifficult, _gameTemplate) {
 
     templateContainer.append(item);
   });
-  changeTemplate(gameDifficult, templates[0]);
+  changeTemplate(gameDifficult, _gameTemplate);
 }
 
 function createDifficultPanel() {
@@ -747,7 +754,7 @@ function clearMatrix() {
   }
 }
 
-function updateMatrixOnDisplay() {
+function updateMatrixOnDisplay(withCross = false) { 
   const matrixContainer = document.querySelector(".matrix__container");
   const cells = matrixContainer.querySelectorAll(".cell");
 
@@ -755,8 +762,16 @@ function updateMatrixOnDisplay() {
     row.forEach((cell, colIndex) => {
       const cellIndex = rowIndex * emptyMatrix[0].length + colIndex;
       if (cells[cellIndex]) {
-        if (cell === 1) {
+        if (cell === 1 && withCross === false) {
+          cells[cellIndex].classList.remove("cell-cross");
           cells[cellIndex].classList.add("cell-active");
+          console.log(true);
+        } 
+        else if (cell === 1 && withCross === true) {
+          cells[cellIndex].classList.add("cell-active");
+        }
+        else if (cell === -1 && withCross === true) {
+          cells[cellIndex].classList.add("cell-cross");
         } else {
           cells[cellIndex].classList.remove("cell-active", "cell-cross");
         }
@@ -773,14 +788,13 @@ function addTimerOnPage() {
 }
 
 function startTimer() {
-  const timer = document.querySelector(".timer");
+  clearInterval(timerInterval);
+  isPaused = false;
 
   timerInterval = setInterval(() => {
     if (isPaused === false) {
     timePassed++;
-    const minutes = Math.floor(timePassed / 60).toString().padStart(2, "0");
-    const seconds = (timePassed % 60).toString().padStart(2, "0");
-    timer.innerHTML = `${minutes}:${seconds}`;
+    updateTimerOnPage();
     }
   }, 1000);
 }
@@ -791,13 +805,18 @@ function pauseTimer() {
 function resumeTimer() {
   isPaused = false;
 }
+function updateTimerOnPage () {
+  const timer = document.querySelector(".timer");
 
+  const minutes = Math.floor(timePassed / 60).toString().padStart(2, "0");
+  const seconds = (timePassed % 60).toString().padStart(2, "0");
+  timer.innerHTML = `${minutes}:${seconds}`;
+}
 function resetTimer() {
   clearInterval(timerInterval);
   timePassed = 0;
-
-  const timer = document.querySelector('.timer')
-  timer.innerHTML = '00:00'
+  isPaused = true;
+  updateTimerOnPage();
 }
 
 function resetGameButton () {
@@ -817,6 +836,7 @@ function resetGameButton () {
           gameOptions.isStarted = false;
           gameOptions.inProcess = false;
           gameOptions.isSolution = false;
+          isLoaded = false;
           resetTimer();
           gameToggler();
           matrixContainer.addEventListener("click", changeEmptyMatrix);
@@ -932,34 +952,125 @@ function randomGameButton() {
   rightPanel.append(randomGameButton);
 }
 
+function saveGameButton () {
+  const saveGameButton = document.createElement("div");
+  saveGameButton.classList.add("save__button");
+  saveGameButton.textContent = "Save Game";
+  saveGameButton.addEventListener('click', function () {
+    localStorage.setItem('gameOptions', JSON.stringify(gameOptions));
+    localStorage.setItem("gameGrid", JSON.stringify(emptyMatrix));
+    localStorage.setItem("timePassed", timePassed.toString()); 
+  })
 
-function gameToggler() {
+  rightPanel.append(saveGameButton);  
+}
+function loadGameButton () {
+  
+  const loadGameButton = document.createElement("div");
+  loadGameButton.classList.add("load__button");
+  loadGameButton.textContent = "Load Game";
+  loadGameButton.addEventListener('click', function () {
+  if (gameOptions.isStarted === false) {    
+    const savedGame = localStorage.getItem('gameOptions');
+    const savedGrid = localStorage.getItem("gameGrid");
+    const savedTime = localStorage.getItem("timePassed");    
+
+    if (savedGame) {
+      Object.assign(gameOptions, JSON.parse(savedGame));
+
+      const difficultButtons = document.querySelectorAll(".difficult__button");
+      difficultButtons.forEach((button) => {
+        if (button.textContent.toLowerCase() === gameOptions.difficult) {
+          button.classList.add("difficult__button--active");
+        } else {
+          button.classList.remove("difficult__button--active");
+        }
+      });
+    
+      createTemplatesPanel(gameOptions.difficult, gameOptions.selectedTemplate);
+      // updateMatrixOnDisplay();
+    }
+    if (savedGrid) {
+      emptyMatrix = JSON.parse(savedGrid);
+      updateMatrixOnDisplay(true);
+    }
+    if (savedTime) {
+      gameToggler();
+      timePassed = parseInt(savedTime);
+      updateTimerOnPage();
+      pauseTimer();
+      isLoaded = true;
+    }
+  } else {
+      async function abort() {
+        const userDecision = await showWarningPopup("Are you want to load a saved game? Your progress will be lost.");
+        if (userDecision === true) {
+          const savedGame = localStorage.getItem("gameOptions");
+          const savedGrid = localStorage.getItem("gameGrid");
+          const savedTime = localStorage.getItem("timePassed");
+
+          if (savedGame) {
+            Object.assign(gameOptions, JSON.parse(savedGame));
+          
+            const difficultButtons = document.querySelectorAll(".difficult__button");
+            difficultButtons.forEach((button) => {
+              if (button.textContent.toLowerCase() === gameOptions.difficult) {
+                button.classList.add("difficult__button--active");
+              } else {
+                button.classList.remove("difficult__button--active");
+              }
+            });
+          
+            createTemplatesPanel(
+              gameOptions.difficult,
+              gameOptions.selectedTemplate
+            );
+            // updateMatrixOnDisplay();
+          }
+          if (savedGrid) {
+            emptyMatrix = JSON.parse(savedGrid);
+            updateMatrixOnDisplay(true);
+          }
+          if (savedTime) {
+            gameToggler();
+            timePassed = parseInt(savedTime);
+            updateTimerOnPage();
+            pauseTimer();
+            isLoaded = true;
+          }
+        } else {
+          return;
+        }
+      }
+      abort();
+    }
+  })
+
+  rightPanel.append(loadGameButton);  
+}
+
+function gameToggler() {  
   const resetGameButton = document.querySelector(".reset__button");
+    
+  if (isLoaded === true) {
+    console.log(true);
+    
+    startTimer()
+    resumeTimer();
+    isLoaded = false;
+  }
+  if (gameOptions.isStarted === true || gameOptions.isSolution === true) {
+    resetGameButton.classList.add("reset__button-active");  
+  }
   if (gameOptions.isStarted === true && gameOptions.inProcess === false) {
     startTimer();
     
-    gameOptions.inProcess = true;
-    console.log('a');
-    
-    if (resetGameButton) {      
-      resetGameButton.classList.add("reset__button-active");
-    }    
-  } else if (gameOptions.isStarted === true && gameOptions.inProcess === true) {
+    gameOptions.inProcess = true;   
+  } else if (gameOptions.isStarted === true && gameOptions.inProcess === true) {    
     return;
-  } else if (gameOptions.isStarted === false && gameOptions.inProcess === false && gameOptions.isSolution === false) {
-    if (resetGameButton) {
-      
-      resetGameButton.classList.remove("reset__button-active");
-      console.log('b');
-      
-    }    
+  } else if (gameOptions.isStarted === false && gameOptions.inProcess === false && gameOptions.isSolution === false) {      
+    resetGameButton.classList.remove("reset__button-active");
   }
-
-  if (gameOptions.isSolution === true) {
-    resetGameButton.classList.add("reset__button-active");
-    
-  }
-
 }
 
 

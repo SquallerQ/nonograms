@@ -164,8 +164,26 @@ body {
 
   cursor: pointer;
 }
+.save__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
+  background-color: lightgreen;
+  padding: 10px 15px;
 
+  cursor: pointer;
+}
+.load__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: navy;
+  padding: 10px 15px;
+
+  cursor: pointer;
+}
 
 
 
