@@ -519,7 +519,6 @@ function createTemplatesPanel(_gameDifficult, _gameTemplate) {
             gameOptions.inProcess = false;
             gameOptions.isSolution = false;
             isLoaded = false;
-            console.log('tut');
             
             resetTimer();
             gameToggler();
@@ -714,6 +713,9 @@ function showSolutionButton() {
   solutionButton.textContent = "Show Solution";
 
   solutionButton.addEventListener("click", () => {
+    if (gameOptions.isSolution === true) {
+      return;
+    } else {
 
     if (gameOptions.isStarted === false) {
       const actualTemplate = templatesObject[gameOptions.difficult][gameOptions.selectedTemplate];
@@ -743,7 +745,9 @@ function showSolutionButton() {
       }
       abort()
     }
+  }
   });
+  
   rightPanel.append(solutionButton);
 }
 function clearMatrix() {
@@ -765,7 +769,6 @@ function updateMatrixOnDisplay(withCross = false) {
         if (cell === 1 && withCross === false) {
           cells[cellIndex].classList.remove("cell-cross");
           cells[cellIndex].classList.add("cell-active");
-          console.log(true);
         } 
         else if (cell === 1 && withCross === true) {
           cells[cellIndex].classList.add("cell-active");
@@ -957,9 +960,13 @@ function saveGameButton () {
   saveGameButton.classList.add("save__button");
   saveGameButton.textContent = "Save Game";
   saveGameButton.addEventListener('click', function () {
-    localStorage.setItem('gameOptions', JSON.stringify(gameOptions));
-    localStorage.setItem("gameGrid", JSON.stringify(emptyMatrix));
-    localStorage.setItem("timePassed", timePassed.toString()); 
+    if (gameOptions.isSolution === true || gameOptions.isStarted === false) {
+      return;
+    } else {
+      localStorage.setItem("gameOptions", JSON.stringify(gameOptions));
+      localStorage.setItem("gameGrid", JSON.stringify(emptyMatrix));
+      localStorage.setItem("timePassed", timePassed.toString()); 
+    }
   })
 
   rightPanel.append(saveGameButton);  
@@ -988,7 +995,6 @@ function loadGameButton () {
       });
     
       createTemplatesPanel(gameOptions.difficult, gameOptions.selectedTemplate);
-      // updateMatrixOnDisplay();
     }
     if (savedGrid) {
       emptyMatrix = JSON.parse(savedGrid);
@@ -1020,12 +1026,7 @@ function loadGameButton () {
                 button.classList.remove("difficult__button--active");
               }
             });
-          
-            createTemplatesPanel(
-              gameOptions.difficult,
-              gameOptions.selectedTemplate
-            );
-            // updateMatrixOnDisplay();
+            createTemplatesPanel(gameOptions.difficult, gameOptions.selectedTemplate);
           }
           if (savedGrid) {
             emptyMatrix = JSON.parse(savedGrid);
@@ -1080,6 +1081,10 @@ function gameToggler() {
 
 
 function createVictoryPopup() {
+  pauseTimer();
+  
+  const finalTime = document.querySelector(".timer").textContent;
+
   const popupContainer = document.createElement("div");
   popupContainer.classList.add("popup__container");
 
@@ -1096,7 +1101,7 @@ function createVictoryPopup() {
 
   const timeTaken = document.createElement("p");
   timeTaken.classList.add("popup__time");
-  timeTaken.textContent = "Time: 00:00";
+  timeTaken.textContent = `Time: ${finalTime}`;
 
   const okButton = document.createElement("div");
   okButton.classList.add("popup__ok-button");
@@ -1108,6 +1113,7 @@ function createVictoryPopup() {
 
   function closePopup() {
     popupContainer.remove();
+    gameOptions.isSolution = true;
   }
 
   closeButton.addEventListener("click", closePopup);
@@ -1116,6 +1122,8 @@ function createVictoryPopup() {
 
 function showWarningPopup(message = 'You sure?') {
   return new Promise((resolve) => {
+  const isGamePaused = (isPaused === true) || (gameOptions.isStarted === false);
+
   pauseTimer();
   
   const popupContainer = document.createElement("div");
@@ -1165,7 +1173,9 @@ function showWarningPopup(message = 'You sure?') {
 
   function closePopup() {
     popupContainer.remove();
-    resumeTimer(); 
+    if (!isGamePaused) {
+      resumeTimer();
+    }
   }
 
   });
