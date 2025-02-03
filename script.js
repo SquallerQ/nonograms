@@ -211,6 +211,10 @@ let isLoaded = false;
 
 const body = document.querySelector("body");
 
+const topContainer = document.createElement("div");
+topContainer.classList.add("top__container");
+body.append(topContainer);
+
 const mainContainer = document.createElement("div");
 mainContainer.classList.add("main__container");
 body.append(mainContainer);
@@ -244,6 +248,11 @@ function startGame () {
   displayMatrix();
 }
 startGame()
+
+function topContainerButtons () {
+  showResultsButton();
+}
+topContainerButtons();
 
 function rightPanelButtons () {
   showSolutionButton();
@@ -432,6 +441,7 @@ function compareMatrix(matrix) {
   const matrixPlayerClickedString = matrix.join(",");
   if (matrixTemplateString === matrixPlayerClickedString) {
     createVictoryPopup();
+    saveResult();
     matrixContainer.removeEventListener("click", changeEmptyMatrix);
     matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
   }
@@ -1075,6 +1085,36 @@ function gameToggler() {
 }
 
 
+function saveResult() {
+  const currentResult = {
+    layout: gameOptions.selectedTemplate,
+    difficulty: gameOptions.difficult,
+    time: timePassed,
+  };
+
+  let results = JSON.parse(localStorage.getItem("gameResults")) || [];
+
+  results.push(currentResult);
+  results.sort((a, b) => a.time - b.time);
+  results = results.slice(0, 5);
+  localStorage.setItem("gameResults", JSON.stringify(results));
+}
+
+
+
+
+function showResultsButton () {
+  const showResultsButton = document.createElement('div');
+  showResultsButton.classList.add('show-results__button');
+  showResultsButton.textContent = 'Show Results';
+  showResultsButton.addEventListener('click', bestResultsPopup)
+
+  topContainer.append(showResultsButton);
+}
+
+
+
+
 
 
 
@@ -1180,4 +1220,82 @@ function showWarningPopup(message = 'You sure?') {
 
   });
 }
-// showWarningPopup()
+
+function bestResultsPopup () {
+  const isGamePaused = (isPaused === true) || (gameOptions.isStarted === false);
+  pauseTimer();
+
+  const results = JSON.parse(localStorage.getItem("gameResults")) || [];
+
+  const popupContainer = document.createElement("div");
+  popupContainer.classList.add("popup__container");
+
+  const popupContent = document.createElement("div");
+  popupContent.classList.add("popup__content");
+
+  const closeButton = document.createElement("div");
+  closeButton.classList.add("popup__close-button");
+  closeButton.innerHTML = "&times;";
+
+  const resultsTitle = document.createElement("div");
+  resultsTitle.classList.add("popup__title");
+  resultsTitle.textContent = "Top 5 Results:";
+
+  const resultsTable = document.createElement("table");
+  resultsTable.classList.add("popup__results-table");
+
+  const tableHeader = document.createElement("tr");
+  tableHeader.innerHTML = `
+    <th>Position</th>
+    <th>Layout</th>
+    <th>Difficulty</th>
+    <th>Time</th>
+  `;
+  resultsTable.appendChild(tableHeader);
+
+  for (let i = 0; i < 5; i++) {
+    const row = document.createElement("tr");
+
+    if (results[i]) {
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${results[i].layout}</td>
+        <td>${results[i].difficulty}</td>
+        <td>${formatTime(results[i].time)}</td>
+      `;
+    } else {
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td>---</td>
+        <td>---</td>
+        <td>---</td>
+      `;
+    }
+
+    resultsTable.appendChild(row);
+  }
+
+  const okButton = document.createElement("div");
+  okButton.classList.add("popup__ok-button");
+  okButton.textContent = "OK";
+
+  popupContent.append(closeButton, resultsTitle, resultsTable, okButton);
+  popupContainer.append(popupContent);
+  document.body.appendChild(popupContainer);
+
+  function closePopup() {
+    popupContainer.remove();
+    if (!isGamePaused) {
+      resumeTimer();
+    }
+  }
+
+  closeButton.addEventListener("click", closePopup);
+  okButton.addEventListener("click", closePopup);
+
+  function formatTime(timeInSeconds) {
+    const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, "0");
+    const seconds = (timeInSeconds % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  }
+}

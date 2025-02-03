@@ -20,6 +20,34 @@ body {
 }
 
 
+.top__container {
+  background-color: #ccc;
+  width: 100%;
+  height: 50px;
+}
+.show-results__button {
+  max-width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: aquamarine;
+  padding: 10px 15px;
+
+  cursor: pointer;
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 .main__container {
   display: flex;
@@ -201,6 +229,8 @@ body {
 }
 
 .popup__content {
+  display: flex;
+  flex-direction: column;
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
@@ -224,6 +254,12 @@ body {
   color: #000;
 }
 
+.popup__title {
+  text-align: left;
+  margin: 5px 0px 0px 5px;
+  font-size: 20px;
+  font-weight: bold;
+}
 .popup__message {
   font-size: 18px;
   margin-bottom: 10px;
@@ -235,6 +271,8 @@ body {
 }
 
 .popup__ok-button {
+  align-self: flex-end;
+  max-width: 100px;
   background-color: green;
   color: #fff;
   padding: 10px 20px;
@@ -262,3 +300,24 @@ body {
   cursor: pointer;
   font-size: 16px;
 }
+
+
+.popup__results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.popup__results-table th, .popup__results-table td {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.popup__results-table th {
+  background-color: #fff;
+  font-weight: bold;
+}
+
+
+
