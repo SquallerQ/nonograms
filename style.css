@@ -1,4 +1,14 @@
+@font-face {
+  font-family: 'Playwrite';
+  src: url('assets/fonts/playwrite-degrund.woff') format('woff'),
+       url('assets/fonts/playwrite-degrund.ttf') format('ttf');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
+  font-family: 'Playwrite', serif;
   /* display: flex; */
 }
 
@@ -52,9 +62,21 @@ body {
 .toggle-sound__button--active {
   background-color: pink;
 }
+.toggle-theme__button {
+  max-width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
+  background-color: aquamarine;
+  padding: 10px 15px;
 
+  cursor: pointer;
+}
 
+.toggle-theme__button--active {
+  background-color: crimson;
+}
 
 
 
@@ -109,7 +131,15 @@ body {
   color: #fff;
   border: 1px solid #ccc;
 }
-
+.bold-line {
+  border-top: 3px solid #fff;
+}
+.bold-line__left{
+  border-left: 3px solid #fff;
+}
+.bold-line__left--top {
+  border-left: 2px solid #fff;
+}
 
 
 .left__container {
@@ -123,6 +153,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 50px 30px;
+  gap: 5px;
 
   
   background-color: red;    
@@ -247,7 +278,7 @@ body {
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
-  width: 300px;
+  width: 500px;
   text-align: center;
   position: relative;
 }
@@ -332,6 +363,5 @@ body {
   background-color: #fff;
   font-weight: bold;
 }
-
 
 

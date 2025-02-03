@@ -223,6 +223,8 @@ function playSound(sound) {
   }
 }
 
+let isDarkTheme = true;
+
 const body = document.querySelector("body");
 
 const topContainer = document.createElement("div");
@@ -266,6 +268,7 @@ startGame()
 function topContainerButtons () {
   showResultsButton();
   toggleSoundButton();
+  toggleThemeButton();
 }
 topContainerButtons();
 
@@ -288,11 +291,21 @@ function displayMatrix() {
     const row = document.createElement("div");
     row.classList.add("matrix__row");
     row.dataset.row = i;
+
+    if (i % 5 === 0 && i !== 0) {
+      row.classList.add("bold-line");
+    }
+
     matrixContainer.append(row);
     for (let j = 0; j < emptyMatrix[i].length; j++) {
       const cell = document.createElement("div");
       cell.dataset.cell = j;
       cell.classList.add("cell");
+
+      if (j % 5 === 0 && j !== 0) {
+        cell.classList.add("bold-line__left");
+      }
+
       row.append(cell);
     }
   }
@@ -358,6 +371,10 @@ function displayCountCellsLeft() {
     leftPanelContainer.append(leftPanelRow);
     leftPanelRow.dataset.rowId = i;
 
+    if (i % 5 === 0 && i !== 0) {
+      leftPanelRow.classList.add("bold-line");
+    }
+
     const matrixRow = matrixTemplate[i];
     let numberOfBlackCells = 0;
     let hasBlackCells = false;
@@ -403,6 +420,10 @@ function displayCountCellsTop() {
     topPanelColumn.classList.add("count-cells__top-column");
     topPanelContainer.append(topPanelColumn);
     topPanelColumn.dataset.columnId = i;
+
+    if (i % 5 === 0 && i !== 0) {
+      topPanelColumn.classList.add("bold-line__left--top");
+    }
 
     const matrixColumn = rotatedMatrix[i];
     let numberOfBlackCells = 0;
@@ -1140,11 +1161,45 @@ function toggleSoundButton () {
 
   topContainer.append(toggleSoundButton);
 }  
+function toggleThemeButton() {
+  const toggleThemeButton = document.createElement("div");
+  toggleThemeButton.classList.add("toggle-theme__button");
+  toggleThemeButton.classList.add("toggle-theme__button--active");
+  toggleThemeButton.textContent = "Theme";
+  toggleThemeButton.addEventListener("click", toggleTheme);
+
+  topContainer.append(toggleThemeButton);
+}  
+
+function toggleTheme () {
+  isDarkTheme = !isDarkTheme;
+  const toggleThemeButton = document.querySelector(".toggle-theme__button");
+  console.log(toggleThemeButton);
+
+  if (isDarkTheme === true) {
+    toggleThemeButton.classList.add("toggle-theme__button--active");
+    applyDarkTheme();
+  } else {
+    toggleThemeButton.classList.remove("toggle-theme__button--active");
+    applyLightTheme();
+  }
+  
+}
+function applyDarkTheme() {
+  console.log('dark theme');
+  
+}
+function applyLightTheme() {
+  console.log('light theme');
+
+}
+
+
+
 
 function toggleSound () {
   isSoundOn = !isSoundOn;
   const soundButton = document.querySelector('.toggle-sound__button');
-  console.log(soundButton);
   
   if (isSoundOn === true) {
     soundButton.classList.add("toggle-sound__button--active");
