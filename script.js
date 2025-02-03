@@ -1156,7 +1156,7 @@ function toggleSoundButton () {
   const toggleSoundButton = document.createElement("div");
   toggleSoundButton.classList.add("toggle-sound__button");
   toggleSoundButton.classList.add("toggle-sound__button--active");
-  toggleSoundButton.textContent = "Sound";
+  toggleSoundButton.textContent = "Sound Off";
   toggleSoundButton.addEventListener("click", toggleSound);
 
   topContainer.append(toggleSoundButton);
@@ -1165,7 +1165,7 @@ function toggleThemeButton() {
   const toggleThemeButton = document.createElement("div");
   toggleThemeButton.classList.add("toggle-theme__button");
   toggleThemeButton.classList.add("toggle-theme__button--active");
-  toggleThemeButton.textContent = "Theme";
+  toggleThemeButton.textContent = "Light";
   toggleThemeButton.addEventListener("click", toggleTheme);
 
   topContainer.append(toggleThemeButton);
@@ -1174,25 +1174,17 @@ function toggleThemeButton() {
 function toggleTheme () {
   isDarkTheme = !isDarkTheme;
   const toggleThemeButton = document.querySelector(".toggle-theme__button");
-  console.log(toggleThemeButton);
 
   if (isDarkTheme === true) {
     toggleThemeButton.classList.add("toggle-theme__button--active");
-    applyDarkTheme();
+    toggleThemeButton.textContent = "Light";
   } else {
     toggleThemeButton.classList.remove("toggle-theme__button--active");
-    applyLightTheme();
+    toggleThemeButton.textContent = "Dark";
   }
-  
+  document.body.classList.toggle("dark-theme", !isDarkTheme);
 }
-function applyDarkTheme() {
-  console.log('dark theme');
-  
-}
-function applyLightTheme() {
-  console.log('light theme');
 
-}
 
 
 
@@ -1203,8 +1195,10 @@ function toggleSound () {
   
   if (isSoundOn === true) {
     soundButton.classList.add("toggle-sound__button--active");
+    soundButton.textContent = "Sound Off";
   } else {
     soundButton.classList.remove("toggle-sound__button--active");
+    soundButton.textContent = "Sound On";
   }
   
 }
