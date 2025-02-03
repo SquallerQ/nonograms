@@ -209,6 +209,20 @@ let timePassed = 0;
 let isPaused = false; 
 let isLoaded = false;
 
+const soundLeftClick = new Audio("assets/sounds/left-click.mp3");
+const soundRightClick = new Audio("assets/sounds/right-click.mp3");
+const soundEraseClick = new Audio("assets/sounds/erase-click.mp3");
+const soundGameWin = new Audio("assets/sounds/game-win.mp3");
+const soundPopup = new Audio("assets/sounds/popup.mp3");
+
+let isSoundOn = true;
+
+function playSound(sound) {
+  if (isSoundOn === true) {
+    sound.play();
+  }
+}
+
 const body = document.querySelector("body");
 
 const topContainer = document.createElement("div");
@@ -251,6 +265,7 @@ startGame()
 
 function topContainerButtons () {
   showResultsButton();
+  toggleSoundButton();
 }
 topContainerButtons();
 
@@ -302,17 +317,21 @@ function changeEmptyMatrix(event) {
       if (!clickedCell.classList.contains("cell-active")) {
         clickedCell.classList.add("cell-active");
         emptyMatrix[rowNumber][cellNumber] = 1;
+        playSound(soundLeftClick);
       } else if (clickedCell.classList.contains("cell-active")) {
         clickedCell.classList.remove("cell-active");
         emptyMatrix[rowNumber][cellNumber] = 0;
+        playSound(soundEraseClick);
       }
     } else if (event.button === 2) {
       clickedCell.classList.remove("cell-active");
 
       if (!clickedCell.classList.contains("cell-cross")) {
         clickedCell.classList.add("cell-cross");
+        playSound(soundRightClick);
       } else if (clickedCell.classList.contains("cell-cross")) {
         clickedCell.classList.remove("cell-cross");
+        playSound(soundEraseClick);
       }
       emptyMatrix[rowNumber][cellNumber] = -1;
     }
@@ -442,6 +461,7 @@ function compareMatrix(matrix) {
   if (matrixTemplateString === matrixPlayerClickedString) {
     createVictoryPopup();
     saveResult();
+    playSound(soundGameWin);
     matrixContainer.removeEventListener("click", changeEmptyMatrix);
     matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
   }
@@ -1111,9 +1131,28 @@ function showResultsButton () {
 
   topContainer.append(showResultsButton);
 }
+function toggleSoundButton () {
+  const toggleSoundButton = document.createElement("div");
+  toggleSoundButton.classList.add("toggle-sound__button");
+  toggleSoundButton.classList.add("toggle-sound__button--active");
+  toggleSoundButton.textContent = "Sound";
+  toggleSoundButton.addEventListener("click", toggleSound);
 
+  topContainer.append(toggleSoundButton);
+}  
 
-
+function toggleSound () {
+  isSoundOn = !isSoundOn;
+  const soundButton = document.querySelector('.toggle-sound__button');
+  console.log(soundButton);
+  
+  if (isSoundOn === true) {
+    soundButton.classList.add("toggle-sound__button--active");
+  } else {
+    soundButton.classList.remove("toggle-sound__button--active");
+  }
+  
+}
 
 
 
@@ -1135,19 +1174,19 @@ function createVictoryPopup() {
   closeButton.classList.add("popup__close-button");
   closeButton.innerHTML = "&times;";
 
+  const resultsTitle = document.createElement("div");
+  resultsTitle.classList.add("popup__title");
+  resultsTitle.textContent = "Great!";
+
   const victoryMessage = document.createElement("p");
   victoryMessage.classList.add("popup__message");
-  victoryMessage.textContent = "You won";
-
-  const timeTaken = document.createElement("p");
-  timeTaken.classList.add("popup__time");
-  timeTaken.textContent = `Time: ${finalTime}`;
+  victoryMessage.textContent = `You have solved the nonogram in ${finalTime} seconds!`;
 
   const okButton = document.createElement("div");
   okButton.classList.add("popup__ok-button");
   okButton.textContent = "OK";
 
-  popupContent.append(closeButton, victoryMessage, timeTaken, okButton);
+  popupContent.append(closeButton, resultsTitle, victoryMessage, okButton);
   popupContainer.append(popupContent);
   document.body.append(popupContainer);
 
@@ -1162,6 +1201,7 @@ function createVictoryPopup() {
 
 function showWarningPopup(message = 'You sure?') {
   return new Promise((resolve) => {
+  playSound(soundPopup);
   const isGamePaused = (isPaused === true) || (gameOptions.isStarted === false);
 
   pauseTimer();
@@ -1222,6 +1262,7 @@ function showWarningPopup(message = 'You sure?') {
 }
 
 function bestResultsPopup () {
+  playSound(soundPopup);
   const isGamePaused = (isPaused === true) || (gameOptions.isStarted === false);
   pauseTimer();
 

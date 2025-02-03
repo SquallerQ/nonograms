@@ -21,6 +21,7 @@ body {
 
 
 .top__container {
+  display: flex;
   background-color: #ccc;
   width: 100%;
   height: 50px;
@@ -37,8 +38,20 @@ body {
   cursor: pointer;
 
 }
+.toggle-sound__button {
+  max-width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
+  background-color: yellow;
+  padding: 10px 15px;
 
+  cursor: pointer;
+}
+.toggle-sound__button--active {
+  background-color: pink;
+}
 
 
 
@@ -263,6 +276,7 @@ body {
 .popup__message {
   font-size: 18px;
   margin-bottom: 10px;
+  text-align: justify;
 }
 
 .popup__time {
