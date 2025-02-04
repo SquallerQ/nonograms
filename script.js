@@ -1158,6 +1158,7 @@ function saveResult() {
 
   results.push(currentResult);
   results = results.slice(-5);
+  results.sort((a, b) => a.time - b.time);
   localStorage.setItem("gameResults", JSON.stringify(results));
 }
 
@@ -1185,7 +1186,7 @@ function toggleThemeButton() {
   const toggleThemeButton = document.createElement("div");
   toggleThemeButton.classList.add("toggle-theme__button");
   toggleThemeButton.classList.add("toggle-theme__button--active");
-  toggleThemeButton.textContent = "Light";
+  // toggleThemeButton.textContent = "Light";
   toggleThemeButton.addEventListener("click", toggleTheme);
 
   topContainer.append(toggleThemeButton);
@@ -1197,10 +1198,10 @@ function toggleTheme () {
 
   if (isDarkTheme === true) {
     toggleThemeButton.classList.add("toggle-theme__button--active");
-    toggleThemeButton.textContent = "Light";
+    // toggleThemeButton.textContent = "Light";
   } else {
     toggleThemeButton.classList.remove("toggle-theme__button--active");
-    toggleThemeButton.textContent = "Dark";
+    // toggleThemeButton.textContent = "Dark";
   }
   document.body.classList.toggle("dark-theme", !isDarkTheme);
 }

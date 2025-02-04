@@ -1,5 +1,5 @@
 html, body {
-    height: 100%;
+  height: 100%;
 } 
 body {
   margin: 0;
@@ -7,6 +7,9 @@ body {
 }
 
 :root {
+  --bg-image: url('assets/images/light.jpg');
+  --theme-icon: url('assets/images/moon.svg');
+
   --main-color: #fff;
   --second-color: #000;
   --border-cell: #d8eeff;
@@ -14,7 +17,6 @@ body {
   --cell-color: #fff;
 
   --bg-color: #fff;
-  --bg-image: url('assets/images/light.jpg');
   --text-color: #fff;
   --border-color: #000;
   --templates: #000;
@@ -28,6 +30,9 @@ body {
   font-display: swap;
 }
 .dark-theme {
+  --bg-image: url('assets/images/dark.jpg');
+  --theme-icon: url('assets/images/sun.svg');
+
   --main-color: #000;
   --second-color: #fff;
   --border-cell: #d9dadb;
@@ -35,7 +40,6 @@ body {
   --cell-color: #fff;
 
   --bg-color: #000;
-  --bg-image: url('assets/images/dark.jpg');
   --text-color: #000;
   --templates: #faebd7;
 
@@ -130,16 +134,17 @@ body {
   /* background-color: pink; */
 }
 .toggle-theme__button {
-  max-width: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-image: var(--theme-icon);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  border-radius: 50%;
 
-  background-color: var(--main-color);
-  color: var(--second-color);
+  width: 60px;
+  height: 60px;
+  background-color: var(--second-color);
 
-  padding: 10px 15px;
-
+  opacity: 0.9;
   cursor: pointer;
 }
 
