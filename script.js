@@ -267,8 +267,8 @@ startGame()
 
 function topContainerButtons () {
   showResultsButton();
-  toggleSoundButton();
   toggleThemeButton();
+  toggleSoundButton();
 }
 topContainerButtons();
 
