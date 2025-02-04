@@ -341,12 +341,13 @@ function changeEmptyMatrix(event) {
 
       if (!clickedCell.classList.contains("cell-cross")) {
         clickedCell.classList.add("cell-cross");
+        emptyMatrix[rowNumber][cellNumber] = -1;
         playSound(soundRightClick);
       } else if (clickedCell.classList.contains("cell-cross")) {
         clickedCell.classList.remove("cell-cross");
         playSound(soundEraseClick);
+        emptyMatrix[rowNumber][cellNumber] = 0;
       }
-      emptyMatrix[rowNumber][cellNumber] = -1;
     }
   } else {
     return;
@@ -477,9 +478,29 @@ function createEmptyMatrix(matrix) {
   return emptyMatrix;
 }
 function compareMatrix(matrix) {
-  const matrixTemplateString = matrixTemplate.join(",");
-  const matrixPlayerClickedString = matrix.join(",");
-  if (matrixTemplateString === matrixPlayerClickedString) {
+  function discardCrosses(mat) {
+  let newMatrix = [];
+    for (let i = 0; i < mat.length; i++) {
+      let newRow = [];
+      for (let j = 0; j < mat[i].length; j++) {
+        if (mat[i][j] === -1) {
+          newRow.push(0);
+        } else {
+          newRow.push(mat[i][j]);
+        }
+      }
+      newMatrix.push(newRow);
+    }
+    return newMatrix;
+  }
+
+  const discardedTemplate = discardCrosses(matrixTemplate);
+  const discardedPlayerMatrix = discardCrosses(matrix);
+
+  const templateString = discardedTemplate.join(",");
+  const playerString = discardedPlayerMatrix.join(",");
+
+  if (templateString === playerString) {
     createVictoryPopup();
     saveResult();
     playSound(soundGameWin);
@@ -1136,8 +1157,7 @@ function saveResult() {
   let results = JSON.parse(localStorage.getItem("gameResults")) || [];
 
   results.push(currentResult);
-  results.sort((a, b) => a.time - b.time);
-  results = results.slice(0, 5);
+  results = results.slice(-5);
   localStorage.setItem("gameResults", JSON.stringify(results));
 }
 
@@ -1329,7 +1349,7 @@ function bestResultsPopup () {
 
   const resultsTitle = document.createElement("div");
   resultsTitle.classList.add("popup__title");
-  resultsTitle.textContent = "Top 5 Results:";
+  resultsTitle.textContent = "Score Table:";
 
   const resultsTable = document.createElement("table");
   resultsTable.classList.add("popup__results-table");

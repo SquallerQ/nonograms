@@ -11,6 +11,7 @@ body {
   --second-color: #000;
   --border-cell: #d8eeff;
   --count-cell: #edc0c0;
+  --cell-color: #fff;
 
   --bg-color: #fff;
   --bg-image: url('assets/images/light.jpg');
@@ -31,7 +32,7 @@ body {
   --second-color: #fff;
   --border-cell: #d9dadb;
   --count-cell: #161616;
-
+  --cell-color: #fff;
 
   --bg-color: #000;
   --bg-image: url('assets/images/dark.jpg');
@@ -62,15 +63,15 @@ body {
   height: min(6vw, 30px);
   font-size: clamp(8px, 2vw, 16px);
 
-  background-color: var(--second-color);
+  background-color: var(--cell-color);
   border: 1px solid var(--border-cell);
   opacity: 0.9;
 }
 .cell-active {
-  background-color: var(--main-color);
+  background-color: #000;
 }
 .cell-cross {
-  background-color: var(--main-color);
+  /* background-color: var(--main-color); */
   position: relative;
 }
 .cell-cross::before,
@@ -81,7 +82,7 @@ body {
   left: 50%;
   width: 80%;
   height: 3px;
-  background-color: var(--second-color);
+  background-color: #000;
   transform-origin: center;
 }
 
@@ -207,13 +208,13 @@ body {
   border: 1px solid var(--main-color);
 }
 .bold-line {
-  border-top: 3px solid var(--main-color);
+  border-top: 3px solid #000;
 }
 .bold-line__left{
-  border-left: 3px solid var(--main-color);
+  border-left: 3px solid #000;
 }
 .bold-line__left--top {
-  border-left: 2px solid var(--main-color);
+  border-left: 2px solid #000;
 }
 
 
