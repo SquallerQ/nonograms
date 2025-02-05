@@ -295,9 +295,11 @@ body {
 }
 .button__solution, .button__reset, .button__save, .button__load {
   opacity: 0.6;
+  cursor: auto;
 }
 .button__solution--active, .button__reset-active, .button__save--active, .button__load--active {
   opacity: 1;
+  cursor: pointer;
 }
 
 
