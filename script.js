@@ -781,7 +781,9 @@ function changeTemplate(_gameDifficult, _templateName) {
 
 function showSolutionButton() {
   const solutionButton = document.createElement("div");
-  solutionButton.classList.add("solution__button");
+  solutionButton.classList.add("button");
+  solutionButton.classList.add("button__solution");
+  solutionButton.classList.add("button__solution--active");
   solutionButton.textContent = "Show Solution";
 
   solutionButton.addEventListener("click", () => {
@@ -896,7 +898,8 @@ function resetTimer() {
 
 function resetGameButton () {
   const resetGameButton = document.createElement("div");
-  resetGameButton.classList.add("reset__button");
+  resetGameButton.classList.add("button");
+  resetGameButton.classList.add("button__reset");
   resetGameButton.textContent = "Reset Game";
 
   resetGameButton.addEventListener("click", () => {
@@ -928,7 +931,8 @@ function resetGameButton () {
 
 function randomGameButton() {
   const randomGameButton = document.createElement("div");
-  randomGameButton.classList.add("random__button");
+  randomGameButton.classList.add("button__random");
+  randomGameButton.classList.add("button");
   randomGameButton.textContent = "Random Game";
 
   randomGameButton.addEventListener("click", () => {
@@ -1029,7 +1033,8 @@ function randomGameButton() {
 
 function saveGameButton () {
   const saveGameButton = document.createElement("div");
-  saveGameButton.classList.add("save__button");
+  saveGameButton.classList.add("button");
+  saveGameButton.classList.add("button__save");
   saveGameButton.textContent = "Save Game";
   saveGameButton.addEventListener('click', function () {
     if (gameOptions.isSolution === true || gameOptions.isStarted === false) {
@@ -1038,6 +1043,9 @@ function saveGameButton () {
       localStorage.setItem("gameOptions", JSON.stringify(gameOptions));
       localStorage.setItem("gameGrid", JSON.stringify(emptyMatrix));
       localStorage.setItem("timePassed", timePassed.toString()); 
+
+      const loadGameButton = document.querySelector('.button__load');
+      loadGameButton.classList.add("button__load--active");      
     }
   })
 
@@ -1046,7 +1054,8 @@ function saveGameButton () {
 function loadGameButton () {
   
   const loadGameButton = document.createElement("div");
-  loadGameButton.classList.add("load__button");
+  loadGameButton.classList.add("button");
+  loadGameButton.classList.add("button__load");
   loadGameButton.textContent = "Load Game";
   loadGameButton.addEventListener('click', function () {
   if (gameOptions.isStarted === false) {    
@@ -1123,8 +1132,20 @@ function loadGameButton () {
 }
 
 function gameToggler() {  
-  const resetGameButton = document.querySelector(".reset__button");
-    
+  const resetGameButton = document.querySelector(".button__reset");
+  const solutionButton = document.querySelector(".button__solution");
+  const saveGameButton = document.querySelector(".button__save");
+
+  if (gameOptions.isSolution === true) {
+    solutionButton.classList.remove('button__solution--active');
+    saveGameButton.classList.remove("button__save--active");
+  } else {
+    solutionButton.classList.add('button__solution--active')
+  }
+
+  if (gameOptions.isStarted === true && gameOptions.inProcess === true && gameOptions.isSolution === true) {      
+    resetGameButton.classList.remove("button__reset-active");
+  }
   if (isLoaded === true) {
     console.log(true);
     
@@ -1133,16 +1154,19 @@ function gameToggler() {
     isLoaded = false;
   }
   if (gameOptions.isStarted === true || gameOptions.isSolution === true) {
-    resetGameButton.classList.add("reset__button-active");  
+    resetGameButton.classList.add("button__reset-active");  
   }
   if (gameOptions.isStarted === true && gameOptions.inProcess === false) {
     startTimer();
     
+    
+    saveGameButton.classList.add("button__save--active");
     gameOptions.inProcess = true;   
   } else if (gameOptions.isStarted === true && gameOptions.inProcess === true) {    
     return;
   } else if (gameOptions.isStarted === false && gameOptions.inProcess === false && gameOptions.isSolution === false) {      
-    resetGameButton.classList.remove("reset__button-active");
+    resetGameButton.classList.remove("button__reset-active");
+    saveGameButton.classList.remove("button__save--active");
   }
 }
 
@@ -1185,30 +1209,13 @@ function toggleSoundButton () {
 function toggleThemeButton() {
   const toggleThemeButton = document.createElement("div");
   toggleThemeButton.classList.add("toggle-theme__button");
-  toggleThemeButton.classList.add("toggle-theme__button--active");
-  // toggleThemeButton.textContent = "Light";
-  toggleThemeButton.addEventListener("click", toggleTheme);
+  toggleThemeButton.addEventListener("click", function () {
+    isDarkTheme = !isDarkTheme;
+    document.body.classList.toggle("dark-theme", !isDarkTheme);
+  });
 
   topContainer.append(toggleThemeButton);
 }  
-
-function toggleTheme () {
-  isDarkTheme = !isDarkTheme;
-  const toggleThemeButton = document.querySelector(".toggle-theme__button");
-
-  if (isDarkTheme === true) {
-    toggleThemeButton.classList.add("toggle-theme__button--active");
-    // toggleThemeButton.textContent = "Light";
-  } else {
-    toggleThemeButton.classList.remove("toggle-theme__button--active");
-    // toggleThemeButton.textContent = "Dark";
-  }
-  document.body.classList.toggle("dark-theme", !isDarkTheme);
-}
-
-
-
-
 
 function toggleSound () {
   isSoundOn = !isSoundOn;
@@ -1223,10 +1230,6 @@ function toggleSound () {
   }
   
 }
-
-
-
-
 
 
 function createVictoryPopup() {
@@ -1263,6 +1266,7 @@ function createVictoryPopup() {
   function closePopup() {
     popupContainer.remove();
     gameOptions.isSolution = true;
+    gameToggler();
   }
 
   closeButton.addEventListener("click", closePopup);

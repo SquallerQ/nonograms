@@ -6,14 +6,6 @@ body {
   padding: 0;
 }
 
-:root {
-  --bg-image: url('assets/images/light.jpg');
-  --theme-icon: url('assets/images/moon.svg');
-
-  --main-color: #fff;
-  --second-color: #000;
-  --accent-color: #edc0c0;
-}
 @font-face {
   font-family: 'Playwrite';
   src: url('assets/fonts/playwrite-degrund.woff') format('woff'),
@@ -21,6 +13,15 @@ body {
   font-weight: normal;
   font-style: normal;
   font-display: swap;
+}
+
+:root {
+  --bg-image: url('assets/images/light.jpg');
+  --theme-icon: url('assets/images/moon.svg');
+
+  --main-color: #fff;
+  --second-color: #000;
+  --accent-color: #edc0c0;
 }
 .dark-theme {
   --bg-image: url('assets/images/dark.jpg');
@@ -36,7 +37,7 @@ body {
   background-image: var(--bg-image);
   background-position: center center;
   background-size: cover;
-  background-repeat: no-repeat;
+  background-repeat: repeat;
   height: 100%;
 
   color: var(--main-color);
@@ -48,8 +49,8 @@ body {
   align-items: center;
   justify-content: center;
 
-  width: min(6vw, 30px);
-  height: min(6vw, 30px);
+  width: min(6vw, 28px);
+  height: min(6vw, 28px);
   font-size: clamp(8px, 2vw, 16px);
 
   background-color: #fff;
@@ -60,7 +61,6 @@ body {
   background-color: #000;
 }
 .cell-cross {
-  /* background-color: var(--main-color); */
   position: relative;
 }
 .cell-cross::before,
@@ -137,11 +137,6 @@ body {
   cursor: pointer;
 }
 
-.toggle-theme__button--active {
-  /* background-color: var(--second-color); */
-  /* color: var(--main-color); */
-}
-
 
 
 
@@ -150,13 +145,14 @@ body {
 
 .main__container {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  padding: 10px 50px;
   
 }
 
 
 .game__container {
-  width: 600px;
+  /* width: 600px; */
   display: grid;
   grid-template-areas: "empty top-panel""left-panel matrix";
   
@@ -193,8 +189,8 @@ body {
   align-items: center;
   justify-content: center;
 
-  width: min(6vw, 30px);
-  height: min(6vw, 30px);
+  width: min(6vw, 28px);
+  height: min(6vw, 28px);
   font-size: clamp(8px, 2vw, 16px);
 
   background-color: var(--accent-color);
@@ -225,7 +221,8 @@ body {
   gap: 5px;
 
   opacity: 0.9;
-  background-color: var(--main-color); 
+  background-color: var(--accent-color); 
+  border: 1px solid var(--second-color);
 }
 .difficult__button {
   padding: 5px 18px;
@@ -264,24 +261,13 @@ body {
 
 
 .right__container {
+  margin-top: 20px;
   min-width: 200px;
   gap: 15px;
   display: flex;
   flex-direction: column;
 }
 
-.solution__button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background-color: var(--main-color);
-  color: var(--second-color);
-  border: 1px solid var(--second-color);
-
-  padding: 10px 15px;
-  cursor: pointer;
-}
 .timer {
   display: flex;
   justify-content: center;
@@ -292,61 +278,28 @@ body {
   background-color: var(--accent-color);
   padding: 10px 15px;
 }
-.reset__button {
+
+.button {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 10px 15px;
 
+  cursor: pointer;
+}
+
+.button__solution, .button__reset, .button__random, .button__save, .button__load {
   background-color: var(--main-color);
   color: var(--second-color);
   border: 1px solid var(--second-color);
-    
-  opacity: 0.6;
-  cursor: pointer;
 }
-.reset__button-active {
+.button__solution, .button__reset, .button__save, .button__load {
+  opacity: 0.6;
+}
+.button__solution--active, .button__reset-active, .button__save--active, .button__load--active {
   opacity: 1;
 }
-.random__button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 
-  background-color: var(--main-color);
-  color: var(--second-color);
-  border: 1px solid var(--second-color);
-
-  padding: 10px 15px;
-
-  cursor: pointer;
-}
-.save__button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background-color: var(--main-color);
-  color: var(--second-color);
-  border: 1px solid var(--second-color);
-
-  padding: 10px 15px;
-
-  cursor: pointer;
-}
-.load__button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background-color: var(--main-color);
-  color: var(--second-color);
-  border: 1px solid var(--second-color);
-
-  padding: 10px 15px;
-
-  cursor: pointer;
-}
 
 
 
@@ -460,7 +413,11 @@ body {
   font-weight: bold;
 }
 
-
+@media (max-width: 1300px) {
+  .game__container {
+    transform: scale(0.8);
+  }
+}
 @media (max-width: 1200px) {
   body {
     background-repeat: repeat;
@@ -480,6 +437,14 @@ body {
 }
 @media (max-width: 850px) {
   .game__container {
+    margin-left: -20px;
     transform: scale(0.6);
   }
 }
+@media (max-width: 650px) {
+  .game__container {
+    margin-left: -90px;
+  }
+}
+
+
