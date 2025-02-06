@@ -1180,9 +1180,21 @@ function saveResult() {
 
   let results = JSON.parse(localStorage.getItem("gameResults")) || [];
 
-  results.push(currentResult);
-  results = results.slice(-5);
+  if (results.length < 5) {
+    results.push(currentResult);
+  } else {
+    const fiveElement = results[4];
+      if (currentResult.time >= fiveElement.time) {
+        results.push(currentResult);
+        results = results.slice(-5);
+      } else {
+        results.pop();
+        results.push(currentResult);
+      }
+
+  }
   results.sort((a, b) => a.time - b.time);
+
   localStorage.setItem("gameResults", JSON.stringify(results));
 }
 
