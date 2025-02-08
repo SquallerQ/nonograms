@@ -231,9 +231,13 @@ const topContainer = document.createElement("div");
 topContainer.classList.add("top__container");
 body.append(topContainer);
 
+const innerContainer = document.createElement("div");
+innerContainer.classList.add("inner__container");
+body.append(innerContainer);
+
 const mainContainer = document.createElement("div");
 mainContainer.classList.add("main__container");
-body.append(mainContainer);
+innerContainer.append(mainContainer);
 
 const leftPanel = document.createElement("div");
 leftPanel.classList.add("left__container");
@@ -262,6 +266,7 @@ function startGame () {
   displayCountCellsLeft();
   displayCountCellsTop();
   displayMatrix();
+  changeCellsSize(); 
 }
 startGame()
 
@@ -280,8 +285,8 @@ function rightPanelButtons () {
   saveGameButton();
   loadGameButton();
 }
-rightPanelButtons()
-
+rightPanelButtons();
+burgerMenuButton();
 
 function displayMatrix() {
   matrixContainer.innerHTML = "";
@@ -630,6 +635,7 @@ function createDifficultPanel() {
 
       gameOptions.isSolution = false;
       gameToggler();
+      changeCellsSize();
 
       createTemplatesPanel();
       changeTemplate(gameOptions.difficult, templateName);
@@ -651,6 +657,7 @@ function createDifficultPanel() {
           gameOptions.isStarted = false;
           gameOptions.inProcess = false;
           gameOptions.isSolution = false;
+          changeCellsSize();
           gameToggler();
           resetTimer();
         } else {
@@ -676,6 +683,7 @@ function createDifficultPanel() {
       gameOptions.isSolution = false;
       gameToggler();
 
+      changeCellsSize();
       createTemplatesPanel();
       changeTemplate(gameOptions.difficult, templateName);
     } else if (gameOptions.isStarted === true && gameOptions.difficult === "medium") {
@@ -695,6 +703,7 @@ function createDifficultPanel() {
           gameOptions.isStarted = false;
           gameOptions.inProcess = false;
           gameOptions.isSolution = false;
+          changeCellsSize();
           gameToggler();
           resetTimer();
         } else {
@@ -722,6 +731,7 @@ function createDifficultPanel() {
       gameToggler();
 
       createTemplatesPanel();
+      changeCellsSize();
       changeTemplate(gameOptions.difficult, templateName);
     } else if (gameOptions.isStarted === true && gameOptions.difficult === "hard") {
       return;
@@ -742,6 +752,7 @@ function createDifficultPanel() {
           gameOptions.inProcess = false;
           gameOptions.isSolution = false;
           gameToggler();
+          changeCellsSize();
           resetTimer();
         } else {
           return;
@@ -975,6 +986,7 @@ function randomGameButton() {
       gameToggler();
       createTemplatesPanel(getDifficult, nameOfTemplate);
       updateMatrixOnDisplay();
+      changeCellsSize();
     } else {
       async function abort() {
         const userDecision = await showWarningPopup("Are you want to choose a random template? Your progress will be lost.");
@@ -1021,6 +1033,7 @@ function randomGameButton() {
 
           createTemplatesPanel(getDifficult, nameOfTemplate);
           updateMatrixOnDisplay();
+          changeCellsSize();
         } else {
           return;
         }
@@ -1179,20 +1192,12 @@ function saveResult() {
   };
 
   let results = JSON.parse(localStorage.getItem("gameResults")) || [];
-
-  if (results.length < 5) {
-    results.push(currentResult);
-  } else {
-    const fiveElement = results[4];
-      if (currentResult.time >= fiveElement.time) {
-        results.push(currentResult);
-        results = results.slice(-5);
-      } else {
-        results.pop();
-        results.push(currentResult);
-      }
-
+  
+  if (results.length >= 5) {
+    results.shift();
   }
+  results.push(currentResult);
+
   results.sort((a, b) => a.time - b.time);
 
   localStorage.setItem("gameResults", JSON.stringify(results));
@@ -1425,4 +1430,41 @@ function bestResultsPopup () {
     const seconds = (timeInSeconds % 60).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
   }
+}
+
+
+
+
+function burgerMenuButton() {
+  const burger = document.createElement("div");
+  burger.classList.add("burger-menu");
+  burger.textContent = "☰";
+  document.body.appendChild(burger);
+
+  const leftContainer = document.querySelector(".left__container");
+  const overlay = document.createElement("div");
+  overlay.classList.add("overlay");
+  document.body.appendChild(overlay);
+
+  function toggleMenu() {
+    leftContainer.classList.toggle("left__container--active");
+    overlay.classList.toggle("overlay--active");
+  }
+
+  burger.addEventListener("click", toggleMenu);
+  overlay.addEventListener("click", toggleMenu);
+}
+
+function changeCellsSize() {
+  let newSize;
+
+  if (gameOptions.difficult === 'easy') {
+    newSize = "min(12vw, 48px)"; 
+  } else if (gameOptions.difficult === "medium") {
+    newSize = "min(8vw, 32px)";
+  } else {
+    newSize = "min(6vw, 24px)";
+  }
+  
+  document.documentElement.style.setProperty("--cell-size", newSize);
 }
