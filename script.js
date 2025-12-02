@@ -1,204 +1,8 @@
-const gameOptions = {
-  difficult: "easy",
-  selectedTemplate: "smile",
-  isStarted: false,
-  inProcess: false,
-  isSolution: false
-};
+import { templatesObject, easyTemplates, mediumTemplates, hardTemplates } from './scripts/templates.js';
+import { gameOptions, sounds, CELL_SIZES } from './scripts/config.js';
+import { initBurgerMenu } from "./scripts/burger.js";
+ 
 let matrixTemplate;
-
-const templatesObject = {
-  easy: {
-    smile: [
-      [1, 1, 0, 1, 1],
-      [1, 1, 0, 1, 1],
-      [0, 0, 0, 0, 0],
-      [1, 0, 0, 0, 1],
-      [0, 1, 1, 1, 0],
-    ],
-    airplane: [
-      [0, 0, 1, 0, 0],
-      [0, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1],
-      [0, 0, 1, 0, 0],
-      [0, 1, 1, 1, 0],
-    ],
-    tower: [
-      [1, 0, 1, 0, 1],
-      [1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 1, 0, 1, 0],
-      [0, 1, 1, 1, 0],
-    ],
-    psy: [
-      [1, 0, 1, 0, 1],
-      [1, 0, 1, 0, 1],
-      [1, 0, 1, 0, 1],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 0],
-    ],
-    hourglass: [
-      [1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 0],
-      [0, 1, 0, 1, 0],
-      [1, 1, 1, 1, 1],
-    ],
-  },
-  medium: {
-    televisor: [
-      [0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-      [0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 0, 1, 1, 0, 0, 0, 0, 1, 1],
-      [1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 0, 0, 0, 0, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-    ],
-    note: [
-      [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 0, 0, 0, 1],
-      [0, 0, 0, 1, 0, 0, 0, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 0, 0, 1],
-      [0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-      [0, 0, 0, 1, 0, 0, 0, 1, 1, 1],
-      [0, 1, 1, 1, 0, 0, 1, 1, 1, 1],
-      [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
-      [1, 1, 1, 1, 0, 0, 0, 1, 1, 0],
-      [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-    ],
-    cherry: [
-      [0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
-      [0, 0, 1, 1, 1, 1, 0, 1, 0, 0],
-      [0, 1, 0, 1, 0, 1, 1, 0, 1, 0],
-      [1, 1, 1, 0, 0, 1, 0, 1, 1, 1],
-      [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-      [0, 0, 1, 1, 1, 0, 1, 1, 1, 0],
-      [0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-      [0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
-      [0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-      [0, 0, 1, 1, 1, 0, 1, 1, 1, 0],
-    ],
-    cup: [
-      [0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
-      [0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-      [0, 1, 1, 0, 1, 1, 1, 1, 1, 1],
-      [0, 1, 1, 0, 1, 1, 1, 1, 0, 1],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-      [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-      [1, 0, 1, 1, 1, 1, 1, 0, 0, 1],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    ],
-    tree: [
-      [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
-      [0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
-      [1, 1, 0, 1, 1, 1, 0, 0, 1, 1],
-      [1, 1, 1, 0, 1, 1, 1, 1, 1, 0],
-      [0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
-      [0, 1, 0, 0, 1, 1, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ],
-  },
-  hard: {
-    mushrooms: [
-      [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
-      [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-      [1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-      [0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
-      [0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0],
-      [0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0],
-      [0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0],
-      [0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0],
-      [0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
-      [0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ],
-    elk: [
-      [1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
-      [1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1],
-      [0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1],
-      [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-      [0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0],
-      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
-      [0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
-    ],
-    home: [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
-      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
-      [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-      [0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0],
-      [0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0],
-      [0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0],
-      [0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0],
-      [0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ],
-    clover: [
-      [0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-      [0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0],
-      [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ],
-    duck: [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1],
-      [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
-      [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-      [1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0],
-      [0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0],
-      [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-    ],
-  },
-};
-
-const easyTemplates = ["smile", "airplane", "tower", "psy", "hourglass"];
-const mediumTemplates = ["televisor", "note", "cherry", "cup", "tree"];
-const hardTemplates = ["mushrooms", "elk", "home", "clover", "duck"];
 
 // matrix for game
 let emptyMatrix = [];
@@ -208,12 +12,6 @@ let timerInterval;
 let timePassed = 0;
 let isPaused = false; 
 let isLoaded = false;
-
-const soundLeftClick = new Audio("assets/sounds/left-click.mp3");
-const soundRightClick = new Audio("assets/sounds/right-click.mp3");
-const soundEraseClick = new Audio("assets/sounds/erase-click.mp3");
-const soundGameWin = new Audio("assets/sounds/game-win.mp3");
-const soundPopup = new Audio("assets/sounds/popup.mp3");
 
 let isSoundOn = true;
 
@@ -286,7 +84,7 @@ function rightPanelButtons () {
   loadGameButton();
 }
 rightPanelButtons();
-burgerMenuButton();
+initBurgerMenu();
 
 function displayMatrix() {
   matrixContainer.innerHTML = "";
@@ -335,11 +133,11 @@ function changeEmptyMatrix(event) {
       if (!clickedCell.classList.contains("cell-active")) {
         clickedCell.classList.add("cell-active");
         emptyMatrix[rowNumber][cellNumber] = 1;
-        playSound(soundLeftClick);
+        playSound(sounds.leftClick)
       } else if (clickedCell.classList.contains("cell-active")) {
         clickedCell.classList.remove("cell-active");
         emptyMatrix[rowNumber][cellNumber] = 0;
-        playSound(soundEraseClick);
+        playSound(sounds.eraseClick);
       }
     } else if (event.button === 2) {
       clickedCell.classList.remove("cell-active");
@@ -347,10 +145,10 @@ function changeEmptyMatrix(event) {
       if (!clickedCell.classList.contains("cell-cross")) {
         clickedCell.classList.add("cell-cross");
         emptyMatrix[rowNumber][cellNumber] = -1;
-        playSound(soundRightClick);
+        playSound(sounds.rightClick);
       } else if (clickedCell.classList.contains("cell-cross")) {
         clickedCell.classList.remove("cell-cross");
-        playSound(soundEraseClick);
+        playSound(sounds.eraseClick);
         emptyMatrix[rowNumber][cellNumber] = 0;
       }
     }
@@ -508,7 +306,7 @@ function compareMatrix(matrix) {
   if (templateString === playerString) {
     createVictoryPopup();
     saveResult();
-    playSound(soundGameWin);
+    playSound(sounds.gameWin);
     matrixContainer.removeEventListener("click", changeEmptyMatrix);
     matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
   }
@@ -869,7 +667,7 @@ function updateMatrixOnDisplay(withCross = false) {
 }
 
 function addTimerOnPage() {
-  timer = document.createElement("div");
+  let timer = document.createElement("div");
   timer.classList.add("timer");
   timer.innerHTML = "00:00";
   rightPanel.append(timer);
@@ -1292,7 +1090,7 @@ function createVictoryPopup() {
 
 function showWarningPopup(message = 'You sure?') {
   return new Promise((resolve) => {
-  playSound(soundPopup);
+  playSound(sounds.popup);
   const isGamePaused = (isPaused === true) || (gameOptions.isStarted === false);
 
   pauseTimer();
@@ -1353,7 +1151,7 @@ function showWarningPopup(message = 'You sure?') {
 }
 
 function bestResultsPopup () {
-  playSound(soundPopup);
+  playSound(sounds.popup);
   const isGamePaused = (isPaused === true) || (gameOptions.isStarted === false);
   pauseTimer();
 
@@ -1432,39 +1230,7 @@ function bestResultsPopup () {
   }
 }
 
-
-
-
-function burgerMenuButton() {
-  const burger = document.createElement("div");
-  burger.classList.add("burger-menu");
-  burger.textContent = "☰";
-  document.body.appendChild(burger);
-
-  const leftContainer = document.querySelector(".left__container");
-  const overlay = document.createElement("div");
-  overlay.classList.add("overlay");
-  document.body.appendChild(overlay);
-
-  function toggleMenu() {
-    leftContainer.classList.toggle("left__container--active");
-    overlay.classList.toggle("overlay--active");
-  }
-
-  burger.addEventListener("click", toggleMenu);
-  overlay.addEventListener("click", toggleMenu);
-}
-
 function changeCellsSize() {
-  let newSize;
-
-  if (gameOptions.difficult === 'easy') {
-    newSize = "min(12vw, 48px)"; 
-  } else if (gameOptions.difficult === "medium") {
-    newSize = "min(8vw, 32px)";
-  } else {
-    newSize = "min(6vw, 24px)";
-  }
-  
+  const newSize = CELL_SIZES[gameOptions.difficult];
   document.documentElement.style.setProperty("--cell-size", newSize);
 }
