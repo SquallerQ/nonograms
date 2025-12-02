@@ -1,7 +1,9 @@
 import { templatesObject, easyTemplates, mediumTemplates, hardTemplates } from './scripts/templates.js';
 import { gameOptions, sounds, CELL_SIZES } from './scripts/config.js';
-import { initBurgerMenu } from "./scripts/burger.js";
- 
+import { initBurgerMenu } from './scripts/burger.js';
+import { rotateMatrix, createEmptyMatrix, compareMatrices } from './scripts/matrix-utils.js';
+import { playSound, toggleSound, toggleTheme } from './scripts/settings.js';
+
 let matrixTemplate;
 
 // matrix for game
@@ -13,15 +15,6 @@ let timePassed = 0;
 let isPaused = false; 
 let isLoaded = false;
 
-let isSoundOn = true;
-
-function playSound(sound) {
-  if (isSoundOn === true) {
-    sound.play();
-  }
-}
-
-let isDarkTheme = true;
 
 const body = document.querySelector("body");
 
@@ -256,54 +249,8 @@ function displayCountCellsTop() {
   }
 }
 
-
-function rotateMatrix(matrix) {
-  const rotatedMatrix = [];
-  for (let col = 0; col < matrix[0].length; col++) {
-    const newRow = [];
-    for (let row = 0; row < matrix.length; row++) {
-      newRow.push(matrix[row][col]);
-    }
-    rotatedMatrix.push(newRow);
-  }
-  return rotatedMatrix;
-}
-function createEmptyMatrix(matrix) {
-  const emptyMatrix = [];
-
-  for (let i = 0; i < matrix.length; i++) {
-    const matrixRow = [];
-    for (let j = 0; j < matrix[i].length; j++) {
-      matrixRow.push(0);
-    }
-    emptyMatrix.push(matrixRow);
-  }
-  return emptyMatrix;
-}
 function compareMatrix(matrix) {
-  function discardCrosses(mat) {
-  let newMatrix = [];
-    for (let i = 0; i < mat.length; i++) {
-      let newRow = [];
-      for (let j = 0; j < mat[i].length; j++) {
-        if (mat[i][j] === -1) {
-          newRow.push(0);
-        } else {
-          newRow.push(mat[i][j]);
-        }
-      }
-      newMatrix.push(newRow);
-    }
-    return newMatrix;
-  }
-
-  const discardedTemplate = discardCrosses(matrixTemplate);
-  const discardedPlayerMatrix = discardCrosses(matrix);
-
-  const templateString = discardedTemplate.join(",");
-  const playerString = discardedPlayerMatrix.join(",");
-
-  if (templateString === playerString) {
+  if (compareMatrices(matrixTemplate, matrix)) {
     createVictoryPopup();
     saveResult();
     playSound(sounds.gameWin);
@@ -1024,28 +971,9 @@ function toggleSoundButton () {
 function toggleThemeButton() {
   const toggleThemeButton = document.createElement("div");
   toggleThemeButton.classList.add("toggle-theme__button");
-  toggleThemeButton.addEventListener("click", function () {
-    isDarkTheme = !isDarkTheme;
-    document.body.classList.toggle("dark-theme", !isDarkTheme);
-  });
-
+  toggleThemeButton.addEventListener("click", toggleTheme);
   topContainer.append(toggleThemeButton);
 }  
-
-function toggleSound () {
-  isSoundOn = !isSoundOn;
-  const soundButton = document.querySelector('.toggle-sound__button');
-  
-  if (isSoundOn === true) {
-    soundButton.classList.add("toggle-sound__button--active");
-    soundButton.textContent = "Sound Off";
-  } else {
-    soundButton.classList.remove("toggle-sound__button--active");
-    soundButton.textContent = "Sound On";
-  }
-  
-}
-
 
 function createVictoryPopup() {
   pauseTimer();
