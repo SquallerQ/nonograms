@@ -3,6 +3,8 @@ import { gameOptions, sounds, CELL_SIZES } from './scripts/config.js';
 import { initBurgerMenu } from './scripts/burger.js';
 import { rotateMatrix, createEmptyMatrix, compareMatrices } from './scripts/matrix-utils.js';
 import { playSound, toggleSound, toggleTheme } from './scripts/settings.js';
+import { saveResult } from './scripts/storage.js';
+import { createTimer } from './scripts/dom-builder.js';
 
 let matrixTemplate;
 
@@ -70,7 +72,8 @@ topContainerButtons();
 
 function rightPanelButtons () {
   showSolutionButton();
-  addTimerOnPage();
+  const timer = createTimer();
+  rightPanel.append(timer);
   resetGameButton();
   randomGameButton();
   saveGameButton();
@@ -252,7 +255,7 @@ function displayCountCellsTop() {
 function compareMatrix(matrix) {
   if (compareMatrices(matrixTemplate, matrix)) {
     createVictoryPopup();
-    saveResult();
+    saveResult(gameOptions.selectedTemplate, gameOptions.difficult, timePassed);
     playSound(sounds.gameWin);
     matrixContainer.removeEventListener("click", changeEmptyMatrix);
     matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
@@ -613,13 +616,6 @@ function updateMatrixOnDisplay(withCross = false) {
   });
 }
 
-function addTimerOnPage() {
-  let timer = document.createElement("div");
-  timer.classList.add("timer");
-  timer.innerHTML = "00:00";
-  rightPanel.append(timer);
-}
-
 function startTimer() {
   clearInterval(timerInterval);
   isPaused = false;
@@ -927,29 +923,6 @@ function gameToggler() {
     saveGameButton.classList.remove("button__save--active");
   }
 }
-
-
-function saveResult() {
-  const currentResult = {
-    layout: gameOptions.selectedTemplate,
-    difficulty: gameOptions.difficult,
-    time: timePassed,
-  };
-
-  let results = JSON.parse(localStorage.getItem("gameResults")) || [];
-  
-  if (results.length >= 5) {
-    results.shift();
-  }
-  results.push(currentResult);
-
-  results.sort((a, b) => a.time - b.time);
-
-  localStorage.setItem("gameResults", JSON.stringify(results));
-}
-
-
-
 
 function showResultsButton () {
   const showResultsButton = document.createElement('div');
