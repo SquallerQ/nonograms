@@ -50,34 +50,34 @@ rightPanelButtons();
 initBurgerMenu();
 
 function displayMatrix() {
-  matrixContainer.innerHTML = "";
+  matrixContainer.innerHTML = '';
 
   emptyMatrix = createEmptyMatrix(matrixTemplate);
   for (let i = 0; i < emptyMatrix.length; i++) {
-    const row = document.createElement("div");
-    row.classList.add("matrix__row");
+    const row = document.createElement('div');
+    row.classList.add('matrix__row');
     row.dataset.row = i;
 
     if (i % 5 === 0 && i !== 0) {
-      row.classList.add("bold-line");
+      row.classList.add('bold-line');
     }
 
     matrixContainer.append(row);
     for (let j = 0; j < emptyMatrix[i].length; j++) {
-      const cell = document.createElement("div");
+      const cell = document.createElement('div');
       cell.dataset.cell = j;
-      cell.classList.add("cell");
+      cell.classList.add('cell');
 
       if (j % 5 === 0 && j !== 0) {
-        cell.classList.add("bold-line__left");
+        cell.classList.add('bold-line__left');
       }
 
       row.append(cell);
     }
   }
 
-  matrixContainer.addEventListener("click", changeEmptyMatrix);
-  matrixContainer.addEventListener("contextmenu", changeEmptyMatrix);
+  matrixContainer.addEventListener('click', changeEmptyMatrix);
+  matrixContainer.addEventListener('contextmenu', changeEmptyMatrix);
 }
 
 
@@ -85,32 +85,32 @@ function changeEmptyMatrix(event) {
   event.preventDefault();
 
   const clickedCell = event.target;
-  if (clickedCell.classList.contains("cell")) {
-    const row = clickedCell.closest(".matrix__row");
+  if (clickedCell.classList.contains('cell')) {
+    const row = clickedCell.closest('.matrix__row');
     const rowNumber = row.dataset.row;
     const cellNumber = clickedCell.dataset.cell;
 
-    if (event.type === "click") {
-      clickedCell.classList.remove("cell-cross");
+    if (event.type === 'click') {
+      clickedCell.classList.remove('cell-cross');
 
-      if (!clickedCell.classList.contains("cell-active")) {
-        clickedCell.classList.add("cell-active");
+      if (!clickedCell.classList.contains('cell-active')) {
+        clickedCell.classList.add('cell-active');
         emptyMatrix[rowNumber][cellNumber] = 1;
         playSound(sounds.leftClick)
-      } else if (clickedCell.classList.contains("cell-active")) {
-        clickedCell.classList.remove("cell-active");
+      } else if (clickedCell.classList.contains('cell-active')) {
+        clickedCell.classList.remove('cell-active');
         emptyMatrix[rowNumber][cellNumber] = 0;
         playSound(sounds.eraseClick);
       }
     } else if (event.button === 2) {
-      clickedCell.classList.remove("cell-active");
+      clickedCell.classList.remove('cell-active');
 
-      if (!clickedCell.classList.contains("cell-cross")) {
-        clickedCell.classList.add("cell-cross");
+      if (!clickedCell.classList.contains('cell-cross')) {
+        clickedCell.classList.add('cell-cross');
         emptyMatrix[rowNumber][cellNumber] = -1;
         playSound(sounds.rightClick);
-      } else if (clickedCell.classList.contains("cell-cross")) {
-        clickedCell.classList.remove("cell-cross");
+      } else if (clickedCell.classList.contains('cell-cross')) {
+        clickedCell.classList.remove('cell-cross');
         playSound(sounds.eraseClick);
         emptyMatrix[rowNumber][cellNumber] = 0;
       }
@@ -128,133 +128,115 @@ function compareMatrix(matrix) {
     createVictoryPopup();
     saveResult(gameOptions.selectedTemplate, gameOptions.difficult, timePassed);
     playSound(sounds.gameWin);
-    matrixContainer.removeEventListener("click", changeEmptyMatrix);
-    matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
+    matrixContainer.removeEventListener('click', changeEmptyMatrix);
+    matrixContainer.removeEventListener('contextmenu', changeEmptyMatrix);
   }
 }
 
 function createTemplatesPanel(_gameDifficult, _gameTemplate) { 
-  let templateContainer = document.querySelector(".template__container");
+  let templateContainer = document.querySelector('.template__container');
 
   if (templateContainer) {
     templateContainer.remove();
   }
 
-  templateContainer = document.createElement("div");
-  templateContainer.classList.add("template__container");
+  templateContainer = document.createElement('div');
+  templateContainer.classList.add('template__container');
   leftPanel.append(templateContainer);
 
-  const templateHeadline = document.createElement("div");
-  templateHeadline.classList.add("template__container-headline");
-  templateHeadline.textContent = "Templates:";
+  const templateHeadline = document.createElement('div');
+  templateHeadline.classList.add('template__container-headline');
+  templateHeadline.textContent = 'Templates:';
   templateContainer.append(templateHeadline);
 
-  let gameDifficult;
-  if (_gameDifficult === undefined) {
-    gameDifficult = gameOptions.difficult;
-  } else {
-    gameDifficult = _gameDifficult;
+  const gameDifficult = _gameDifficult || gameOptions.difficult;
+  
+  const templatesMap = {
+    easy: easyTemplates,
+    medium: mediumTemplates,
+    hard: hardTemplates
+  };
+  const templates = templatesMap[gameDifficult];
+  
+  const selectedTemplate = (_gameTemplate && templates.includes(_gameTemplate)) ? _gameTemplate : templates[0];
+
+  async function handleTemplateClick(templateName) {
+    if (gameOptions.isStarted === false) {
+      selectTemplate(templateName);
+    } else if (templateName === gameOptions.selectedTemplate) {
+      return;
+    } else {
+      const userDecision = await showWarningPopup(
+        'Are you want to change the template? Your progress will be lost.'
+      );
+      if (userDecision) {
+        selectTemplate(templateName);
+        gameOptions.isStarted = false;
+        gameOptions.inProcess = false;
+        gameOptions.isSolution = false;
+        isLoaded = false;
+        resetTimer();
+        gameToggler();
+      }
+    }
   }
 
-  let templates;
+  function selectTemplate(templateName) {
+    const allItems = document.querySelectorAll('.template__item');
+    allItems.forEach((el) => el.classList.remove('template__item--active'));
+    
+    const activeItem = Array.from(allItems).find(item => item.textContent === templateName);
+    if (activeItem) {
+      activeItem.classList.add('template__item--active');
+    }
 
-  if (gameDifficult === "easy") {
-    templates = easyTemplates;
-  } else if (gameDifficult === "medium") {
-    templates = mediumTemplates;
-  } else if (gameDifficult === "hard") {
-    templates = hardTemplates;
-  }
-  if (_gameTemplate === false || !templates.includes(_gameTemplate)) {
-    _gameTemplate = templates[0];
+    gameOptions.selectedTemplate = templateName;
+    gameOptions.isSolution = false;
+    isLoaded = false;
+    gameToggler();
+    changeTemplate(gameDifficult, templateName);
   }
 
   templates.forEach((templateName) => {
-    const item = document.createElement("div");
+    const item = document.createElement('div');
     item.textContent = templateName;
-    item.classList.add("template__item");
+    item.classList.add('template__item');
  
-    if (templateName === _gameTemplate) {
-      item.classList.add("template__item--active");
+    if (templateName === selectedTemplate) {
+      item.classList.add('template__item--active');
     }
 
-    item.addEventListener("click", () => {
-      if (gameOptions.isStarted === false) {
-        const allItems = document.querySelectorAll(".template__item");
-        allItems.forEach((el) => el.classList.remove("template__item--active"));
-
-        item.classList.add("template__item--active");
-
-        gameOptions.selectedTemplate = templateName;
-
-        gameOptions.isSolution = false;
-        isLoaded = false;
-        gameToggler();
-
-        changeTemplate(gameDifficult, templateName);
-      } else if (gameOptions.isStarted === true && item.textContent === gameOptions.selectedTemplate) {
-        console.log(true, item.textContent);
-      } else {
-        async function abortGame() {
-          const userDecision = await showWarningPopup(
-            "Are you want to change the template? Your progress will be lost."
-          );
-          if (userDecision === true) {
-            const allItems = document.querySelectorAll(".template__item");
-            allItems.forEach((el) =>
-              el.classList.remove("template__item--active")
-            );
-
-            item.classList.add("template__item--active");
-
-            gameOptions.selectedTemplate = templateName;
-
-            changeTemplate(gameDifficult, templateName);
-
-            gameOptions.isStarted = false;
-            gameOptions.inProcess = false;
-            gameOptions.isSolution = false;
-            isLoaded = false;
-            
-            resetTimer();
-            gameToggler();
-          } else {
-            return;
-          }
-        }
-        abortGame();
-      }
-    });
-
+    item.addEventListener('click', () => handleTemplateClick(templateName));
     templateContainer.append(item);
   });
-  changeTemplate(gameDifficult, _gameTemplate);
+
+  changeTemplate(gameDifficult, selectedTemplate);
 }
 
 function createDifficultPanel() {
-  const difficultContainer = document.createElement("div");
-  difficultContainer.classList.add("difficult__container");
+  const difficultContainer = document.createElement('div');
+  difficultContainer.classList.add('difficult__container');
   leftPanel.append(difficultContainer);
 
-  const easyButton = document.createElement("div");
-  easyButton.classList.add("difficult__button", "difficult__button--active");
-  easyButton.textContent = "Easy";
+  const easyButton = document.createElement('div');
+  easyButton.classList.add('difficult__button', 'difficult__button--active');
+  easyButton.textContent = 'Easy';
 
-  const mediumButton = document.createElement("div");
-  mediumButton.classList.add("difficult__button");
-  mediumButton.textContent = "Medium";
+  const mediumButton = document.createElement('div');
+  mediumButton.classList.add('difficult__button');
+  mediumButton.textContent = 'Medium';
 
-  const hardButton = document.createElement("div");
-  hardButton.classList.add("difficult__button");
-  hardButton.textContent = "Hard";
+  const hardButton = document.createElement('div');
+  hardButton.classList.add('difficult__button');
+  hardButton.textContent = 'Hard';
 
   const buttons = { easy: easyButton, medium: mediumButton, hard: hardButton };
 
   function setActiveButton(difficulty) {
     Object.keys(buttons).forEach((key) => {
-      buttons[key].classList.remove("difficult__button--active");
+      buttons[key].classList.remove('difficult__button--active');
     });
-    buttons[difficulty].classList.add("difficult__button--active");
+    buttons[difficulty].classList.add('difficult__button--active');
   }
 
   function changeDifficulty(newDifficulty, templates) {
@@ -282,7 +264,7 @@ function createDifficultPanel() {
     } else {
       async function abort() {
         const userDecision = await showWarningPopup(
-          "Are you want to change the difficulty? Your progress will be lost."
+          'Are you want to change the difficulty? Your progress will be lost.'
         );
         if (userDecision === true) {
           changeDifficulty(targetDifficulty, templates);
@@ -295,14 +277,14 @@ function createDifficultPanel() {
     }
   }
 
-  easyButton.addEventListener("click", () =>
-    handleDifficultyClick("easy", easyTemplates)
+  easyButton.addEventListener('click', () =>
+    handleDifficultyClick('easy', easyTemplates)
   );
-  mediumButton.addEventListener("click", () =>
-    handleDifficultyClick("medium", mediumTemplates)
+  mediumButton.addEventListener('click', () =>
+    handleDifficultyClick('medium', mediumTemplates)
   );
-  hardButton.addEventListener("click", () =>
-    handleDifficultyClick("hard", hardTemplates)
+  hardButton.addEventListener('click', () =>
+    handleDifficultyClick('hard', hardTemplates)
   );
 
   difficultContainer.append(easyButton, mediumButton, hardButton);
@@ -321,10 +303,10 @@ function changeTemplate(_gameDifficult, _templateName) {
     for (let j = 0; j < emptyMatrix[i].length; j++) {
       emptyMatrix[i][j] = 0;
       const cell = document.querySelector(
-        `.matrix__row[data-row="${i}"] .cell[data-cell="${j}"]`
+        `.matrix__row[data-row='${i}'] .cell[data-cell='${j}']`
       );
       if (cell) {
-        cell.classList.remove("cell-active", "cell-cross");
+        cell.classList.remove('cell-active', 'cell-cross');
       }
     }
   }
@@ -334,13 +316,13 @@ function changeTemplate(_gameDifficult, _templateName) {
 }
 
 function showSolutionButton() {
-  const solutionButton = document.createElement("div");
-  solutionButton.classList.add("button");
-  solutionButton.classList.add("button__solution");
-  solutionButton.classList.add("button__solution--active");
-  solutionButton.textContent = "Show Solution";
+  const solutionButton = document.createElement('div');
+  solutionButton.classList.add('button');
+  solutionButton.classList.add('button__solution');
+  solutionButton.classList.add('button__solution--active');
+  solutionButton.textContent = 'Show Solution';
 
-  solutionButton.addEventListener("click", () => {
+  solutionButton.addEventListener('click', () => {
     if (gameOptions.isSolution === true) {
       return;
     } else {
@@ -349,13 +331,13 @@ function showSolutionButton() {
       const actualTemplate = templatesObject[gameOptions.difficult][gameOptions.selectedTemplate];
       emptyMatrix = actualTemplate.map((row) => [...row]);
       updateMatrixOnDisplay(emptyMatrix);
-      matrixContainer.removeEventListener("click", changeEmptyMatrix);
-      matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
+      matrixContainer.removeEventListener('click', changeEmptyMatrix);
+      matrixContainer.removeEventListener('contextmenu', changeEmptyMatrix);
       gameOptions.isSolution = true;
       gameToggler();
     } else {
       async function abort() {
-        const userDecision = await showWarningPopup("Are you want to show the solution? Your progress will be lost.");
+        const userDecision = await showWarningPopup('Are you want to show the solution? Your progress will be lost.');
         if (userDecision === true) {
           const actualTemplate = templatesObject[gameOptions.difficult][gameOptions.selectedTemplate];
           emptyMatrix = actualTemplate.map((row) => [...row]);
@@ -365,8 +347,8 @@ function showSolutionButton() {
           gameOptions.isSolution = true;
           resetTimer();
           gameToggler();
-          matrixContainer.removeEventListener("click", changeEmptyMatrix);
-          matrixContainer.removeEventListener("contextmenu", changeEmptyMatrix);
+          matrixContainer.removeEventListener('click', changeEmptyMatrix);
+          matrixContainer.removeEventListener('contextmenu', changeEmptyMatrix);
         } else {
           return;
         }
@@ -398,10 +380,10 @@ function resumeTimer() {
   isPaused = false;
 }
 function updateTimerOnPage () {
-  const timer = document.querySelector(".timer");
+  const timer = document.querySelector('.timer');
 
-  const minutes = Math.floor(timePassed / 60).toString().padStart(2, "0");
-  const seconds = (timePassed % 60).toString().padStart(2, "0");
+  const minutes = Math.floor(timePassed / 60).toString().padStart(2, '0');
+  const seconds = (timePassed % 60).toString().padStart(2, '0');
   timer.innerHTML = `${minutes}:${seconds}`;
 }
 function resetTimer() {
@@ -412,17 +394,17 @@ function resetTimer() {
 }
 
 function resetGameButton () {
-  const resetGameButton = document.createElement("div");
-  resetGameButton.classList.add("button");
-  resetGameButton.classList.add("button__reset");
-  resetGameButton.textContent = "Reset Game";
+  const resetGameButton = document.createElement('div');
+  resetGameButton.classList.add('button');
+  resetGameButton.classList.add('button__reset');
+  resetGameButton.textContent = 'Reset Game';
 
-  resetGameButton.addEventListener("click", () => {
+  resetGameButton.addEventListener('click', () => {
     if (gameOptions.isStarted === false && gameOptions.isSolution === false) {
       return;
     } else {
       async function abort() {
-        const userDecision = await showWarningPopup("Are you want to reset the game? Your progress will be lost.");
+        const userDecision = await showWarningPopup('Are you want to reset the game? Your progress will be lost.');
         if (userDecision === true) {                
           clearMatrix(emptyMatrix);
           updateMatrixOnDisplay(emptyMatrix);
@@ -432,8 +414,8 @@ function resetGameButton () {
           isLoaded = false;
           resetTimer();
           gameToggler();
-          matrixContainer.addEventListener("click", changeEmptyMatrix);
-          matrixContainer.addEventListener("contextmenu", changeEmptyMatrix);
+          matrixContainer.addEventListener('click', changeEmptyMatrix);
+          matrixContainer.addEventListener('contextmenu', changeEmptyMatrix);
         } else {
           return;
         }
@@ -445,12 +427,12 @@ function resetGameButton () {
 }
 
 function randomGameButton() {
-  const randomGameButton = document.createElement("div");
-  randomGameButton.classList.add("button__random");
-  randomGameButton.classList.add("button");
-  randomGameButton.textContent = "Random Game";
+  const randomGameButton = document.createElement('div');
+  randomGameButton.classList.add('button__random');
+  randomGameButton.classList.add('button');
+  randomGameButton.textContent = 'Random Game';
 
-  randomGameButton.addEventListener("click", () => {
+  randomGameButton.addEventListener('click', () => {
     if (gameOptions.isStarted === false) {      
       const activeDifficultButton = document.querySelector('.difficult__button--active');
       activeDifficultButton.classList.remove('difficult__button--active');
@@ -478,8 +460,8 @@ function randomGameButton() {
       let nextTemplateIndex = (currentTemplateIndex + 1) % templates.length;
       nameOfTemplate = templates[nextTemplateIndex];
 
-      const difficultButtons = document.querySelectorAll(".difficult__button");
-      difficultButtons[randomDifficultIndex].classList.add("difficult__button--active");
+      const difficultButtons = document.querySelectorAll('.difficult__button');
+      difficultButtons[randomDifficultIndex].classList.add('difficult__button--active');
 
       const getDifficult = difficultButtons[randomDifficultIndex].textContent.toLowerCase();
       
@@ -493,7 +475,7 @@ function randomGameButton() {
       changeCellsSize();
     } else {
       async function abort() {
-        const userDecision = await showWarningPopup("Are you want to choose a random template? Your progress will be lost.");
+        const userDecision = await showWarningPopup('Are you want to choose a random template? Your progress will be lost.');
         if (userDecision === true) {
           const activeDifficultButton = document.querySelector('.difficult__button--active');
           activeDifficultButton.classList.remove('difficult__button--active');
@@ -521,8 +503,8 @@ function randomGameButton() {
           let nextTemplateIndex = (currentTemplateIndex + 1) % templates.length;
           nameOfTemplate = templates[nextTemplateIndex];
 
-          const difficultButtons = document.querySelectorAll(".difficult__button");
-          difficultButtons[randomDifficultIndex].classList.add("difficult__button--active");
+          const difficultButtons = document.querySelectorAll('.difficult__button');
+          difficultButtons[randomDifficultIndex].classList.add('difficult__button--active');
 
           const getDifficult = difficultButtons[randomDifficultIndex].textContent.toLowerCase();
 
@@ -549,20 +531,20 @@ function randomGameButton() {
 }
 
 function saveGameButton () {
-  const saveGameButton = document.createElement("div");
-  saveGameButton.classList.add("button");
-  saveGameButton.classList.add("button__save");
-  saveGameButton.textContent = "Save Game";
+  const saveGameButton = document.createElement('div');
+  saveGameButton.classList.add('button');
+  saveGameButton.classList.add('button__save');
+  saveGameButton.textContent = 'Save Game';
   saveGameButton.addEventListener('click', function () {
     if (gameOptions.isSolution === true || gameOptions.isStarted === false) {
       return;
     } else {
-      localStorage.setItem("gameOptions", JSON.stringify(gameOptions));
-      localStorage.setItem("gameGrid", JSON.stringify(emptyMatrix));
-      localStorage.setItem("timePassed", timePassed.toString()); 
+      localStorage.setItem('gameOptions', JSON.stringify(gameOptions));
+      localStorage.setItem('gameGrid', JSON.stringify(emptyMatrix));
+      localStorage.setItem('timePassed', timePassed.toString()); 
 
       const loadGameButton = document.querySelector('.button__load');
-      loadGameButton.classList.add("button__load--active");      
+      loadGameButton.classList.add('button__load--active');      
     }
   })
 
@@ -570,25 +552,25 @@ function saveGameButton () {
 }
 function loadGameButton () {
   
-  const loadGameButton = document.createElement("div");
-  loadGameButton.classList.add("button");
-  loadGameButton.classList.add("button__load");
-  loadGameButton.textContent = "Load Game";
+  const loadGameButton = document.createElement('div');
+  loadGameButton.classList.add('button');
+  loadGameButton.classList.add('button__load');
+  loadGameButton.textContent = 'Load Game';
   loadGameButton.addEventListener('click', function () {
   if (gameOptions.isStarted === false) {    
     const savedGame = localStorage.getItem('gameOptions');
-    const savedGrid = localStorage.getItem("gameGrid");
-    const savedTime = localStorage.getItem("timePassed");    
+    const savedGrid = localStorage.getItem('gameGrid');
+    const savedTime = localStorage.getItem('timePassed');    
 
     if (savedGame) {
       Object.assign(gameOptions, JSON.parse(savedGame));
 
-      const difficultButtons = document.querySelectorAll(".difficult__button");
+      const difficultButtons = document.querySelectorAll('.difficult__button');
       difficultButtons.forEach((button) => {
         if (button.textContent.toLowerCase() === gameOptions.difficult) {
-          button.classList.add("difficult__button--active");
+          button.classList.add('difficult__button--active');
         } else {
-          button.classList.remove("difficult__button--active");
+          button.classList.remove('difficult__button--active');
         }
       });
     
@@ -607,21 +589,21 @@ function loadGameButton () {
     }
   } else {
       async function abort() {
-        const userDecision = await showWarningPopup("Are you want to load a saved game? Your progress will be lost.");
+        const userDecision = await showWarningPopup('Are you want to load a saved game? Your progress will be lost.');
         if (userDecision === true) {
-          const savedGame = localStorage.getItem("gameOptions");
-          const savedGrid = localStorage.getItem("gameGrid");
-          const savedTime = localStorage.getItem("timePassed");
+          const savedGame = localStorage.getItem('gameOptions');
+          const savedGrid = localStorage.getItem('gameGrid');
+          const savedTime = localStorage.getItem('timePassed');
 
           if (savedGame) {
             Object.assign(gameOptions, JSON.parse(savedGame));
           
-            const difficultButtons = document.querySelectorAll(".difficult__button");
+            const difficultButtons = document.querySelectorAll('.difficult__button');
             difficultButtons.forEach((button) => {
               if (button.textContent.toLowerCase() === gameOptions.difficult) {
-                button.classList.add("difficult__button--active");
+                button.classList.add('difficult__button--active');
               } else {
-                button.classList.remove("difficult__button--active");
+                button.classList.remove('difficult__button--active');
               }
             });
             createTemplatesPanel(gameOptions.difficult, gameOptions.selectedTemplate);
@@ -649,19 +631,19 @@ function loadGameButton () {
 }
 
 function gameToggler() {  
-  const resetGameButton = document.querySelector(".button__reset");
-  const solutionButton = document.querySelector(".button__solution");
-  const saveGameButton = document.querySelector(".button__save");
+  const resetGameButton = document.querySelector('.button__reset');
+  const solutionButton = document.querySelector('.button__solution');
+  const saveGameButton = document.querySelector('.button__save');
 
   if (gameOptions.isSolution === true) {
     solutionButton.classList.remove('button__solution--active');
-    saveGameButton.classList.remove("button__save--active");
+    saveGameButton.classList.remove('button__save--active');
   } else {
     solutionButton.classList.add('button__solution--active')
   }
 
   if (gameOptions.isStarted === true && gameOptions.inProcess === true && gameOptions.isSolution === true) {      
-    resetGameButton.classList.remove("button__reset-active");
+    resetGameButton.classList.remove('button__reset-active');
   }
   if (isLoaded === true) {
     console.log(true);
@@ -671,19 +653,19 @@ function gameToggler() {
     isLoaded = false;
   }
   if (gameOptions.isStarted === true || gameOptions.isSolution === true) {
-    resetGameButton.classList.add("button__reset-active");  
+    resetGameButton.classList.add('button__reset-active');  
   }
   if (gameOptions.isStarted === true && gameOptions.inProcess === false) {
     startTimer();
     
     
-    saveGameButton.classList.add("button__save--active");
+    saveGameButton.classList.add('button__save--active');
     gameOptions.inProcess = true;   
   } else if (gameOptions.isStarted === true && gameOptions.inProcess === true) {    
     return;
   } else if (gameOptions.isStarted === false && gameOptions.inProcess === false && gameOptions.isSolution === false) {      
-    resetGameButton.classList.remove("button__reset-active");
-    saveGameButton.classList.remove("button__save--active");
+    resetGameButton.classList.remove('button__reset-active');
+    saveGameButton.classList.remove('button__save--active');
   }
 }
 
@@ -696,47 +678,47 @@ function showResultsButton () {
   topContainer.append(showResultsButton);
 }
 function toggleSoundButton () {
-  const toggleSoundButton = document.createElement("div");
-  toggleSoundButton.classList.add("toggle-sound__button");
-  toggleSoundButton.classList.add("toggle-sound__button--active");
-  toggleSoundButton.textContent = "Sound Off";
-  toggleSoundButton.addEventListener("click", toggleSound);
+  const toggleSoundButton = document.createElement('div');
+  toggleSoundButton.classList.add('toggle-sound__button');
+  toggleSoundButton.classList.add('toggle-sound__button--active');
+  toggleSoundButton.textContent = 'Sound Off';
+  toggleSoundButton.addEventListener('click', toggleSound);
 
   topContainer.append(toggleSoundButton);
 }  
 function toggleThemeButton() {
-  const toggleThemeButton = document.createElement("div");
-  toggleThemeButton.classList.add("toggle-theme__button");
-  toggleThemeButton.addEventListener("click", toggleTheme);
+  const toggleThemeButton = document.createElement('div');
+  toggleThemeButton.classList.add('toggle-theme__button');
+  toggleThemeButton.addEventListener('click', toggleTheme);
   topContainer.append(toggleThemeButton);
 }  
 
 function createVictoryPopup() {
   pauseTimer();
   
-  const finalTime = document.querySelector(".timer").textContent;
+  const finalTime = document.querySelector('.timer').textContent;
 
-  const popupContainer = document.createElement("div");
-  popupContainer.classList.add("popup__container");
+  const popupContainer = document.createElement('div');
+  popupContainer.classList.add('popup__container');
 
-  const popupContent = document.createElement("div");
-  popupContent.classList.add("popup__content");
+  const popupContent = document.createElement('div');
+  popupContent.classList.add('popup__content');
 
-  const closeButton = document.createElement("div");
-  closeButton.classList.add("popup__close-button");
-  closeButton.innerHTML = "&times;";
+  const closeButton = document.createElement('div');
+  closeButton.classList.add('popup__close-button');
+  closeButton.innerHTML = '&times;';
 
-  const resultsTitle = document.createElement("div");
-  resultsTitle.classList.add("popup__title");
-  resultsTitle.textContent = "Great!";
+  const resultsTitle = document.createElement('div');
+  resultsTitle.classList.add('popup__title');
+  resultsTitle.textContent = 'Great!';
 
-  const victoryMessage = document.createElement("p");
-  victoryMessage.classList.add("popup__message");
+  const victoryMessage = document.createElement('p');
+  victoryMessage.classList.add('popup__message');
   victoryMessage.textContent = `You have solved the nonogram in ${finalTime} seconds!`;
 
-  const okButton = document.createElement("div");
-  okButton.classList.add("popup__ok-button");
-  okButton.textContent = "OK";
+  const okButton = document.createElement('div');
+  okButton.classList.add('popup__ok-button');
+  okButton.textContent = 'OK';
 
   popupContent.append(closeButton, resultsTitle, victoryMessage, okButton);
   popupContainer.append(popupContent);
@@ -748,8 +730,8 @@ function createVictoryPopup() {
     gameToggler();
   }
 
-  closeButton.addEventListener("click", closePopup);
-  okButton.addEventListener("click", closePopup);
+  closeButton.addEventListener('click', closePopup);
+  okButton.addEventListener('click', closePopup);
 }
 
 function showWarningPopup(message = 'You sure?') {
@@ -759,41 +741,41 @@ function showWarningPopup(message = 'You sure?') {
 
   pauseTimer();
   
-  const popupContainer = document.createElement("div");
-  popupContainer.classList.add("popup__container");
+  const popupContainer = document.createElement('div');
+  popupContainer.classList.add('popup__container');
 
-  const popupContent = document.createElement("div");
-  popupContent.classList.add("popup__content");
+  const popupContent = document.createElement('div');
+  popupContent.classList.add('popup__content');
 
-  const popupMessage = document.createElement("p");
-  popupMessage.classList.add("popup__message");
+  const popupMessage = document.createElement('p');
+  popupMessage.classList.add('popup__message');
   popupMessage.innerText = message;
 
-  const buttonsContainer = document.createElement("div");
-  buttonsContainer.classList.add("popup__buttons");
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.classList.add('popup__buttons');
 
-  const closeButton = document.createElement("div");
-  closeButton.classList.add("popup__close-button");
-  closeButton.innerHTML = "&times;";
+  const closeButton = document.createElement('div');
+  closeButton.classList.add('popup__close-button');
+  closeButton.innerHTML = '&times;';
 
-  const okButton = document.createElement("div");
-  okButton.classList.add("popup__ok-button");
-  okButton.textContent = "OK";
+  const okButton = document.createElement('div');
+  okButton.classList.add('popup__ok-button');
+  okButton.textContent = 'OK';
 
-  okButton.addEventListener("click", () => {
+  okButton.addEventListener('click', () => {
     closePopup();
     resolve(true);
   });
 
-  const cancelButton = document.createElement("div");
-  cancelButton.classList.add("popup__cancel-button");
-  cancelButton.textContent = "Cancel";
+  const cancelButton = document.createElement('div');
+  cancelButton.classList.add('popup__cancel-button');
+  cancelButton.textContent = 'Cancel';
 
-  cancelButton.addEventListener("click", () => {
+  cancelButton.addEventListener('click', () => {
     closePopup();
     resolve(false);
   });
-  closeButton.addEventListener("click", () => {
+  closeButton.addEventListener('click', () => {
     closePopup();
     resolve(false);
   });
@@ -819,26 +801,26 @@ function bestResultsPopup () {
   const isGamePaused = (isPaused === true) || (gameOptions.isStarted === false);
   pauseTimer();
 
-  const results = JSON.parse(localStorage.getItem("gameResults")) || [];
+  const results = JSON.parse(localStorage.getItem('gameResults')) || [];
 
-  const popupContainer = document.createElement("div");
-  popupContainer.classList.add("popup__container");
+  const popupContainer = document.createElement('div');
+  popupContainer.classList.add('popup__container');
 
-  const popupContent = document.createElement("div");
-  popupContent.classList.add("popup__content");
+  const popupContent = document.createElement('div');
+  popupContent.classList.add('popup__content');
 
-  const closeButton = document.createElement("div");
-  closeButton.classList.add("popup__close-button");
-  closeButton.innerHTML = "&times;";
+  const closeButton = document.createElement('div');
+  closeButton.classList.add('popup__close-button');
+  closeButton.innerHTML = '&times;';
 
-  const resultsTitle = document.createElement("div");
-  resultsTitle.classList.add("popup__title");
-  resultsTitle.textContent = "Score Table:";
+  const resultsTitle = document.createElement('div');
+  resultsTitle.classList.add('popup__title');
+  resultsTitle.textContent = 'Score Table:';
 
-  const resultsTable = document.createElement("table");
-  resultsTable.classList.add("popup__results-table");
+  const resultsTable = document.createElement('table');
+  resultsTable.classList.add('popup__results-table');
 
-  const tableHeader = document.createElement("tr");
+  const tableHeader = document.createElement('tr');
   tableHeader.innerHTML = `
     <th>Position</th>
     <th>Layout</th>
@@ -848,7 +830,7 @@ function bestResultsPopup () {
   resultsTable.appendChild(tableHeader);
 
   for (let i = 0; i < 5; i++) {
-    const row = document.createElement("tr");
+    const row = document.createElement('tr');
 
     if (results[i]) {
       row.innerHTML = `
@@ -869,9 +851,9 @@ function bestResultsPopup () {
     resultsTable.appendChild(row);
   }
 
-  const okButton = document.createElement("div");
-  okButton.classList.add("popup__ok-button");
-  okButton.textContent = "OK";
+  const okButton = document.createElement('div');
+  okButton.classList.add('popup__ok-button');
+  okButton.textContent = 'OK';
 
   popupContent.append(closeButton, resultsTitle, resultsTable, okButton);
   popupContainer.append(popupContent);
@@ -884,17 +866,17 @@ function bestResultsPopup () {
     }
   }
 
-  closeButton.addEventListener("click", closePopup);
-  okButton.addEventListener("click", closePopup);
+  closeButton.addEventListener('click', closePopup);
+  okButton.addEventListener('click', closePopup);
 
   function formatTime(timeInSeconds) {
-    const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, "0");
-    const seconds = (timeInSeconds % 60).toString().padStart(2, "0");
+    const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, '0');
+    const seconds = (timeInSeconds % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
   }
 }
 
 function changeCellsSize() {
   const newSize = CELL_SIZES[gameOptions.difficult];
-  document.documentElement.style.setProperty("--cell-size", newSize);
+  document.documentElement.style.setProperty('--cell-size', newSize);
 }
