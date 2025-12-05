@@ -17,5 +17,5 @@ export const sounds = {
 export const CELL_SIZES = {
   easy: 'min(12vw, 48px)',
   medium: 'min(8vw, 32px)',
-  hard: 'min(6vw, 24px)',
+  hard: 'min(7vw, 28px)',
 };

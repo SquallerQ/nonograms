@@ -141,24 +141,15 @@ body {
 }
 
 
-
-
-
-
-
 .main__container {
   display: flex;
   justify-content: space-between;
-  padding: 10px 50px;
-  
+  padding: 50px 50px 10px 50px;
 }
-
 
 .game__container {
   display: grid;
   grid-template-areas: "empty top-panel""left-panel matrix";
-  
-  
 }
 .matrix__container {
   grid-area: matrix;
@@ -182,9 +173,6 @@ body {
 }
 .count-cells__left-row {
   display: flex;
-}
-.count-cells__top-column {
-
 }
 .count__cell {
   display: flex;
@@ -211,8 +199,8 @@ body {
 
 
 .left__container {
+  margin-top: 20px;
   max-width: 350px;
-  /* min-height: 300px; */
 }
 
 .difficult__container {
@@ -234,11 +222,6 @@ body {
 }
 .difficult__button--active {
   background-color: var(--second-color); 
-}
-.template__container {
-  /* min-width: 300px;
-  min-height: 300px;
-  background-color: aqua; */
 }
 .template__container-headline {
   padding: 5px 15px;
